@@ -1,0 +1,14 @@
+>genome1.fw
+aaggNttcc
+AAA
+>genome1.rc
+GGAANCCTT
+@genome1-len8
+12345678
++
+abcdefgh
+@genome1-len9
+123456789
++
+ABCDEFGHI
+
