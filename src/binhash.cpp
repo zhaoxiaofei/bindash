@@ -29,6 +29,9 @@
 #include <string.h>
 #include <time.h>
 
+#define STR_EXPAND(tok) #tok
+#define STR(tok) STR_EXPAND(tok)
+
 void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 	entity.name = fname;
 	uint64_t genome_size = 0;
@@ -130,6 +133,15 @@ int cmddist_print(FILE *outfile, const Entity &query, const Entity &target, doub
 	return fprintf(outfile, "%s\t%s\t%f\t%f\t%lu/%lu\n", query.name.c_str(), target.name.c_str(), mutdist, pvalue, raw_intersize, raw_unionsize);
 }
 
+const char *ordinal_num_to_suffix(const size_t n) {
+	if (n % 10 > 3 || n % 10 == 0 || (10 <= n % 100 && n % 100 <= 20)) {
+		return "th";
+	}	
+	if (n % 10 == 1) { return "st"; }
+	if (n % 10 == 2) { return "nd"; }
+	if (n % 10 == 3) { return "rd"; }
+}
+
 template<bool tCLUSTER, bool tNNEIGHBORS>
 void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &entities2, 
 		const Sketchargs &args1, const Distargs &args) {
@@ -140,7 +152,7 @@ void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &en
 		if ("-" == args.outfname) { 
 			outfiles[i] = stdout;
 		} else {
-			outfiles[i] = fopen((args.outfname + args.suffix + std::to_string(i)).c_str(), "w");
+			outfiles[i] = fopen((args.outfname + "." + std::to_string(i) + ordinal_num_to_suffix(i+1) + args.suffix).c_str(), "w");
 			if (NULL == outfiles[i]) {
 				std::cerr << "Unable to open the file " << args.outfname << " for writing.\n";
 				exit(-1);
@@ -198,6 +210,7 @@ void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &en
 
 
 int main(int argc, char **argv) {
+	std::cerr << argv[0] << " version " << (STR(GIT_COMMIT_HASH)) << " " << (STR((GIT_DIFF_SHORTSTAT))) << std::endl;
 	auto t = clock();
 	if (argc < 2 || !strcmp("--help", argv[1])) { allusage(argc, argv); }
 	
@@ -213,9 +226,7 @@ int main(int argc, char **argv) {
 				kmerset_dist(kmersetVec[i], kmersetVec[j], args.kmerlen);			
 			}
 		}
-	}
-
-	if (!strcmp("sketch", argv[1])) {
+	} else if (!strcmp("sketch", argv[1])) {
 		Sketchargs args;
 		args.parse(argc, argv);	
 		std::vector<Entity> entities(args.infnames.size(), Entity());
@@ -230,9 +241,7 @@ int main(int argc, char **argv) {
 		save_entities(entities, args.outfname);
 		args.write();
 		std::cerr << "Hash initialization consumed " << (clock() - t) / CLOCKS_PER_SEC << " seconds" << std::endl;
-	}
-
-	if (!strcmp("dist", argv[1])) {
+	} else if (!strcmp("dist", argv[1])) {
 		Distargs args;
 		args.parse(argc, argv);
 	
@@ -262,7 +271,10 @@ int main(int argc, char **argv) {
 			cmddist<true, false>(entities1, entities1, args1, args);
 		} else {
 			cmddist<false, false>(entities1, entities2, args1, args);
-		} 
+		}
+	} else {
+		std::cerr << "Unrecognized command: " << argv[1] <<  "\n";
+		allusage(argc, argv);
 	}
 }
 

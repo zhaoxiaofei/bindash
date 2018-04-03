@@ -171,7 +171,7 @@ const double intersize_to_jaccard(const unsigned int intersize, size_t sketchsiz
 	return (double)intersize / (double)(NBITS(uint64_t) * sketchsize64);
 }
 
-const double intersize_to_dice(const unsigned int intersize, size_t sketchsize64, double smoothfactor = (DBL_TRUE_MIN*(1ULL<<30ULL))) {
+const double intersize_to_dice(const unsigned int intersize, size_t sketchsize64, double smoothfactor = (DBL_MIN*(1ULL<<30ULL))) {
 	return (double)(2 * intersize + smoothfactor) / (double)(NBITS(uint64_t) * sketchsize64 + intersize + smoothfactor);
 }
 
