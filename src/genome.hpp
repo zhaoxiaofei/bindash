@@ -145,9 +145,9 @@ T non_neg_minus(T a, T b) {
 	return a > b ? (a - b) : 0;
 }
 
-const size_t calc_intersize12(const Entity &e1, const Entity &e2, size_t sketchsize64, const size_t bbits) {
-	assert (e1.usigs.size() == e2.usigs.size());	
-	assert (e1.usigs.size() == sketchsize64 * bbits);
+const size_t calc_intersize12(const Entity &e1, const Entity &e2, const size_t sketchsize64, const size_t bbits) {
+	// assert (e1.usigs.size() == e2.usigs.size());	
+	// assert (e1.usigs.size() == sketchsize64 * bbits);
 	size_t samebits = 0;
 	for (size_t i = 0; i < sketchsize64; i++) {
 		uint64_t bits = ~((uint64_t)0ULL);
@@ -160,11 +160,17 @@ const size_t calc_intersize12(const Entity &e1, const Entity &e2, size_t sketchs
 		samebits += __builtin_popcountll(bits);
 	}
 	// std::cout << " samebits = " << std::hex << samebits << std::endl;
+	size_t expected_samebits = ((sketchsize64 * NBITS(uint64_t)) >> bbits);
+	return non_neg_minus(samebits, expected_samebits);
+
+#if 0 // This commented-out code works but has lots of complexity that is not justified so far
+	// return sketchsize64 * NBITS(uint64_t) - samebits;
 	size_t diffbits = sketchsize64 * NBITS(uint64_t) - samebits;
 	size_t multiplier = (1ULL << bbits);
 	size_t divider = multiplier - 1;
 	diffbits = ROUNDDIV(diffbits * multiplier, divider);
 	return non_neg_minus((sketchsize64 * NBITS(uint64_t)), diffbits);
+#endif
 }
 
 const double intersize_to_jaccard(const unsigned int intersize, size_t sketchsize64) {

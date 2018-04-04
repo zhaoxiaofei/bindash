@@ -35,7 +35,7 @@ void allusage(const int argc, const char *const *argv) {
 class Sketchargs {
 public:
 	std::vector<std::string> infnames;
-	size_t bbits = 2;
+	size_t bbits = 11; // 2; // = log2(64 * sketchsize64)
 	bool iscasepreserved = false;
 	bool isstrandpreserved = false;
 	size_t kmerlen = 21;
