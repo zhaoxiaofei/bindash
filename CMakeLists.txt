@@ -28,7 +28,7 @@ execute_process(
 add_definitions("-DGIT_COMMIT_HASH=${GIT_COMMIT_HASH}")
 add_definitions("-DGIT_DIFF_SHORTSTAT=${GIT_DIFF_SHORTSTAT}")
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast") # fast floating point arithmetics
 add_executable (binhash ./src/binhash.cpp)
 target_link_libraries(binhash -lm)

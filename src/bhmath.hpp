@@ -143,7 +143,7 @@ void NORMTABLE_init(size_t size) {
 double bhmath_ppois_tail(unsigned int x, double lambda) {	
 	double currpmf = exp(-lambda);
 	double currtail = 1.0 - currpmf;
-	unsigned int upperlimit = MIN(x, (int)((lambda + 1) * 2));
+	unsigned int upperlimit = MIN(x, (unsigned int)((lambda + 1) * 2));
 	unsigned int i = 1;	
 	for (; i <= upperlimit; i++) {
 		currpmf = currpmf * lambda / i;

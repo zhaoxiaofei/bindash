@@ -12,6 +12,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define STR_EXPAND(tok) #tok
+#define STR(tok) STR_EXPAND(tok)
+
 void allusage(const int argc, const char *const *argv) {
 	std::cerr << "Usage:\n  " << argv[0] << " <commmand> [options] [arguments ...]\n\n";
 	std::cerr << "Commands:\n\n";
@@ -104,6 +107,7 @@ int Sketchargs::write() {
 		std::cerr << "Error: cannot open the file " << outfname << " for writing\n";
 		exit(-1);
 	}
+	file << "--COMMENT=revision-" << (STR(GIT_COMMIT_HASH)) << " " << (STR((GIT_DIFF_SHORTSTAT))) << "\n";
 	file << "--bbits=" << bbits << "\n";
 	file << "--iscasepreserved=" << iscasepreserved << "\n";
 	file << "--isstrandpreserved=" << isstrandpreserved << "\n";
@@ -178,7 +182,8 @@ int Sketchargs::_parse(std::string arg) {
 	else if ("--outfname" == key) { issval >> outfname; }
 	else if ("--randseed" == key) { issval >> randseed; }
 	else if ("--sketchsize64" == key) { issval >> sketchsize64; }
-	else if (key.find("--", 0) != 0) {				
+	else if ("--COMMENT" == key) { /* do nothing */ }
+	else if (key.find("--", 0) != 0) {
 		infnames.push_back(arg);
 		return 0; 
 	} else {
