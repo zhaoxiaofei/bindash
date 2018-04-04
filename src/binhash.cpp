@@ -246,7 +246,7 @@ int main(int argc, char **argv) {
 			entity_init(entities[i], args.infnames[i].c_str(), args);
 			if (0 == (i & (i + 1))) {
 				std::cerr << "Initialization of the first " <<  i + 1 << " entities consumed " << (clock()-t) / CLOCKS_PER_SEC << " seconds. " 
-				          << entities[i].usigs.size() << " kmers were hashes\n";
+				          << "The last sequence is converted into " << entities[i].usigs.size() << " 64-bit integers.\n";
 			}
 		}
 		save_entities(entities, args.outfname);
