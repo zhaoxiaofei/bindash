@@ -109,8 +109,8 @@ int Sketchargs::write() {
 	}
 	file << "--COMMENT=revision-" << (STR(GIT_COMMIT_HASH)) << " " << (STR((GIT_DIFF_SHORTSTAT))) << "\n";
 	file << "--bbits=" << bbits << "\n";
-	file << "--iscasepreserved=" << iscasepreserved << "\n";
-	file << "--isstrandpreserved=" << isstrandpreserved << "\n";
+	file << std::boolalpha << "--iscasepreserved=" << iscasepreserved << "\n";
+	file << std::boolalpha << "--isstrandpreserved=" << isstrandpreserved << "\n";
 	file << "--kmerlen=" << kmerlen << "\n";
 	file << "--minhashtype=" << minhashtype << "\n";
 	file << "--nthreads=" << nthreads << "\n";
