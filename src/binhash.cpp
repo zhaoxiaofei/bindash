@@ -29,9 +29,6 @@
 #include <string.h>
 #include <time.h>
 
-#define STR_EXPAND(tok) #tok
-#define STR(tok) STR_EXPAND(tok)
-
 void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 	entity.name = fname;
 	uint64_t genome_size = 0;
@@ -140,14 +137,22 @@ const char *ordinal_num_to_suffix(const size_t n) {
 	if (n % 10 == 1) { return "st"; }
 	if (n % 10 == 2) { return "nd"; }
 	if (n % 10 == 3) { return "rd"; }
+	abort();
 }
 
 template<bool tCLUSTER, bool tNNEIGHBORS>
 void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &entities2, 
 		const Sketchargs &args1, const Distargs &args) {
+
 	size_t nthreads = args.nthreads;
+	if (0 == nthreads) {
+#if defined(_OPENMP)
+		nthreads = omp_get_max_threads();
+#else
+		nthreads = 1;
+#endif
+	}
 	std::vector<FILE*> outfiles(nthreads, NULL);
-	FILE *outfile;		
 	for (size_t i = 0; i < nthreads; i++) {
 		if ("-" == args.outfname) { 
 			outfiles[i] = stdout;
@@ -161,7 +166,10 @@ void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &en
 	}
 	std::vector<double> intersize_to_mutdist;
 	intersize_to_mutdist_init(intersize_to_mutdist, args1.sketchsize64, args1.kmerlen);
-#pragma omp parallel for schedule(static, 1) num_threads((nthreads ? nthreads : omp_get_max_threads()))
+
+#if defined(_OPENMP)
+#pragma omp parallel for schedule(static, 1) num_threads(nthreads)
+#endif
 	for (size_t i = 0; i < entities1.size(); i++) {
 		std::priority_queue<std::tuple<size_t, size_t, size_t, Entity>> tophits;
 		for (size_t j = ((tCLUSTER && !tNNEIGHBORS) ? (i+1) : 0); j < entities2.size(); j++) {
@@ -210,7 +218,7 @@ void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &en
 
 
 int main(int argc, char **argv) {
-	std::cerr << argv[0] << " version " << (STR(GIT_COMMIT_HASH)) << " " << (STR((GIT_DIFF_SHORTSTAT))) << std::endl;
+	std::cerr << argv[0] << " revision " << (STR(GIT_COMMIT_HASH)) << " " << (STR((GIT_DIFF_SHORTSTAT))) << std::endl;
 	auto t = clock();
 	if (argc < 2 || !strcmp("--help", argv[1])) { allusage(argc, argv); }
 	
@@ -230,7 +238,10 @@ int main(int argc, char **argv) {
 		Sketchargs args;
 		args.parse(argc, argv);	
 		std::vector<Entity> entities(args.infnames.size(), Entity());
+
+#if defined(_OPENMP)
 #pragma omp parallel for schedule(static, 1) num_threads((args.nthreads ? args.nthreads : omp_get_max_threads()))
+#endif
 		for (size_t i = 0; i < entities.size(); i++) {
 			entity_init(entities[i], args.infnames[i].c_str(), args);
 			if (0 == (i & (i + 1))) {
