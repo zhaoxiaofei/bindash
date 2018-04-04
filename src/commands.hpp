@@ -38,6 +38,7 @@ public:
 	size_t bbits = 11; // 2; // = log2(64 * sketchsize64)
 	bool iscasepreserved = false;
 	bool isstrandpreserved = false;
+	std::string listfname = "-";
 	size_t kmerlen = 21;
 	int minhashtype = 2;
 	size_t nthreads = 1;
@@ -79,10 +80,11 @@ int Sketchargs::usage(const int argc, const char *const *argv) {
 	assert(1 < argc);
 	std::cerr << "Usage: " << argv[0] << " " << argv[1] << " [options] [arguments ...]" << "\n\n";
 	std::cerr << "Arguments:\n\n"
-	          << "  Zero or more filenames. If zero filenames (not supplied), then read from stdin.\n" 
+	          << "  Zero or more filenames. If zero filenames, then read from each line in listfname.\n"
 	          << "  Each filename specifies a path to a sequence file.\n\n";
-	std::cerr << "Options:\n\n";
+	std::cerr << "Options with [default values]:\n\n";
 	std::cerr << "  --help : Show this help message." << "\n\n";
+	std::cerr << "  --listfname: Name of the file, in which each line specifies a path to a sequence file. [" << listfname << "]\n\n";
 	std::cerr << "  --nthreads : This many threads will be spawned for processing. [" << nthreads << "]\n\n";
 	std::cerr << "  --minhashtype : Type of minhash.\n" 
 	          << "    -1 means perfect hash function for nucleotides where 5^(kmerlen) < 2^63.\n" 
@@ -98,6 +100,8 @@ int Sketchargs::usage(const int argc, const char *const *argv) {
 	           << "     same letter are treated as two different letters. [" << std::boolalpha << iscasepreserved << "]\n\n";
 	std::cerr << "  --randseed : Seed to provide to the hash function. [" << randseed << "]." << "\n\n";
 	std::cerr << "  --outfname : Name of the file containing sketches as output [" << outfname << " (time-dependent)]." << "\n\n";
+	std::cerr << "Notes:\n\n";
+	std::cerr << "  \"-\" (without quotes) means stdin.\n\n";
 	exit(1);
 }
 
@@ -112,6 +116,7 @@ int Sketchargs::write() {
 	file << std::boolalpha << "--iscasepreserved=" << iscasepreserved << "\n";
 	file << std::boolalpha << "--isstrandpreserved=" << isstrandpreserved << "\n";
 	file << "--kmerlen=" << kmerlen << "\n";
+	file << "--listfname=" << listfname << "\n";
 	file << "--minhashtype=" << minhashtype << "\n";
 	file << "--nthreads=" << nthreads << "\n";
 	file << "--outfname=" << outfname << "\n";
@@ -154,13 +159,24 @@ int Sketchargs::parse(const int argc, const char *const *argv) {
 			usage(argc, argv);
 		}
 	}
-	if (infnames.size() == 0) {
-		std::cerr << "Reading input filenames from stdin\n";
+	if (infnames.size() == 0 && listfname == "-") {
+		std::cerr << "Reading input filenames from stdin.\n";
 		std::cerr << "Enter \"--help\" (without quotes) to show usage.\n";
 		for (std::string line; std::getline(std::cin, line);) {
 			if (line == "--help") { usage(argc, argv); }
 			infnames.push_back(line);
 		}
+	} else if (infnames.size() == 0) {
+		std::cerr << "Reading input filenames from " << listfname << ".\n";
+		std::ifstream listfstream(listfname);
+		if (!listfstream) {
+			std::cerr << "The listfname "  << listfname << " cannot be opened.\n";
+			exit(4);
+		}
+		for (std::string line; std::getline(listfstream, line);) {
+			infnames.push_back(line);
+		}
+		listfstream.close();	
 	}
 	return 0;
 }
@@ -177,6 +193,7 @@ int Sketchargs::_parse(std::string arg) {
 	else if ("--iscasepreserved" == key) { issval >> std::boolalpha >> iscasepreserved; }
 	else if ("--isstrandpreserved" == key) { issval >> std::boolalpha >> isstrandpreserved; }
 	else if ("--kmerlen" ==  key) { issval >> kmerlen; }
+	else if ("--listfname" ==  key) { issval >> listfname; }
 	else if ("--minhashtype" ==  key) { issval >> minhashtype; }
 	else if ("--nthreads" == key) { issval >> nthreads; }
 	else if ("--outfname" == key) { issval >> outfname; }
@@ -222,15 +239,16 @@ int Distargs::usage(const int argc, const char *const *argv) {
 	std::cerr << "  --nneighbors : Only this number of best-hit results per query are reported.\n" 
 	          << "    If this value is zero then report all. [" << nneighbors << "].\n\n";
 	std::cerr << "  --nthreads : This many threads will be spawned for processing. [" << nthreads << "]\n\n";
-	std::cerr << "  --outfname : Prefix(es) of the file(s) containing comparison between query and target.\n"
+	std::cerr << "  --outfname : Prefix(es) of the output file(s) containing comparison between query and target.\n"
 	          << "    The file name ends with the suffix \"" << suffix << "\" (not applicable to stdout).\n"
 	          << "    The file contains the following tab-separated fields per result line:\n"
-	          << "    query-sketch, target-sketch, mutation-distance, p-value, and jaccard-index. [" << outfname << " (stdout)].\n\n";
+	          << "    query-sketch, target-sketch, mutation-distance, p-value, and jaccard-index. [" << outfname << "].\n\n";
 	std::cerr << "  --pthres : only results with at most this p-value are reported. [" << pthres << "]\n\n";
 	std::cerr << "Note:\n\n";
 	std::cerr << "  If target-sketch is omitted and --nneighbors is zero,\n" 
 	          << "    then distance from genome A to genome B is the same as distance from B to A.\n"
 	          << "    In this case, only one record is reported per set of two genomes due to reflectivity.\n\n";
+	std::cerr << "  \"-\" (without quotes) means stdout.\n\n";
 	exit(1);
 }
 
