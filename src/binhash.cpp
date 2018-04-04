@@ -157,7 +157,7 @@ void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &en
 		if ("-" == args.outfname) { 
 			outfiles[i] = stdout;
 		} else {
-			outfiles[i] = fopen((args.outfname + "." + std::to_string(i) + ordinal_num_to_suffix(i+1) + args.suffix).c_str(), "w");
+			outfiles[i] = fopen((args.outfname + "." + std::to_string(i+1) + ordinal_num_to_suffix(i+1) + args.suffix).c_str(), "w");
 			if (NULL == outfiles[i]) {
 				std::cerr << "Unable to open the file " << args.outfname << " for writing.\n";
 				exit(-1);
@@ -166,6 +166,7 @@ void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &en
 	}
 	std::vector<double> intersize_to_mutdist;
 	intersize_to_mutdist_init(intersize_to_mutdist, args1.sketchsize64, args1.kmerlen);
+	auto t = clock();	
 
 #if defined(_OPENMP)
 #pragma omp parallel for schedule(static, 1) num_threads(nthreads)
@@ -208,7 +209,12 @@ void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &en
 						args1.sketchsize64, args.mthres, args.pthres, std::get<1>(*it), std::get<2>(*it));
 			}
 		}
+		if (0 == (i & (i + 1))) {
+			std::cerr << "Processed " << i + 1 << " queries in " << (clock() - t) / CLOCKS_PER_SEC << " seconds." << std::endl;
+		}
 	}
+	std::cerr << "Distance calculation consumed " << (clock() - t) / CLOCKS_PER_SEC << " seconds." << std::endl;
+
 	for (size_t i = 0; i < nthreads; i++) {
 		if (outfiles[i] != stdout) {
 			fclose(outfiles[i]);
