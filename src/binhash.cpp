@@ -180,7 +180,7 @@ void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &en
 			} else {
 				intersize = calc_intersize12(entities1[i], entities2[j], args1.sketchsize64, args1.bbits);
 				raw_intersize = intersize;
-				raw_unionsize = 2 * NBITS(uint64_t) * args1.sketchsize64 - raw_intersize;
+				raw_unionsize = NBITS(uint64_t) * args1.sketchsize64;
 			}
 			const size_t interdiff = NBITS(uint64_t) * args1.sketchsize64 - intersize;
 			if (tNNEIGHBORS)	{
