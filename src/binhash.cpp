@@ -66,7 +66,7 @@ void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 		_DnaPerfectHash hfrc(args.kmerlen);
 		while (1) {
 			cbuf.eatnext(file);
-			if (XEOF(file)) { break; }
+			if (cbuf.ceof()) { break; }
 			hashupdateDna(cbuf, signset, hf, hfrc, args.isstrandpreserved);
 		}
 		genome_size = signset.size();
@@ -79,7 +79,7 @@ void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 		hashinit0(cbuf, hf, hfrc, args.kmerlen);
 		while (1) {
 			cbuf.eatnext(file);
-			if (XEOF(file)) { break; }
+			if (cbuf.ceof()) { break; }
 			hashupdate0(cbuf, signqueue, signset, hf, hfrc, args.isstrandpreserved, args.sketchsize64);
 		}
 		assert (signqueue.size() <= args.sketchsize64 * NBITS(uint64_t));
@@ -112,7 +112,7 @@ void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 		hashinit1(cbuf, hfs, hfrcs, args.kmerlen, args.sketchsize64);
 		while (1) {
 			cbuf.eatnext(file);
-			if (XEOF(file)) { break; }
+			if (cbuf.ceof()) { break; }
 			hashupdate1(cbuf, signs, hfs, hfrcs, args.isstrandpreserved, args.sketchsize64);
 		}
 		genome_size = estimate_genome_size1(signs);	
@@ -125,7 +125,7 @@ void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 		hashinit2(cbuf, hf, hfrc, args.kmerlen);
 		while (1) {
 			cbuf.eatnext(file);
-			if (XEOF(file)) { break; }
+			if (cbuf.ceof()) { break; }
 			hashupdate2(cbuf, signs, hf, hfrc, args.isstrandpreserved, args.sketchsize64);
 		}
 		genome_size = estimate_genome_size2(signs, args.sketchsize64);

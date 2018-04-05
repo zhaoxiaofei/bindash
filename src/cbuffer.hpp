@@ -27,14 +27,14 @@
 #define XFILE  gzFile
 #define XOPEN  gzopen
 #define XCLOSE gzclose
-#define XEOF   gzeof
-#define XGETC  gzgetc
+//#define XEOF   gzeof
+//#define XGETC  gzgetc
 #else
 #define XFILE  FILE*
 #define XOPEN  fopen
 #define XCLOSE fclose
-#define XEOF   feof
-#define XGETC  fgetc
+//#define XEOF   feof
+//#define XGETC  fgetc
 #endif
 
 #include <string>
@@ -44,6 +44,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define BUFSIZE (256*1024)
 
 const unsigned char RCMAP[256] = {
   0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
@@ -70,6 +72,10 @@ const unsigned char RCMAP[256] = {
 240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255};
 
 class CBuf {
+private:
+	char buffer[BUFSIZE+1];
+	int bufidx = BUFSIZE;
+	int readsize = BUFSIZE;
 public:
 	size_t idx = 0;
 	const bool iscasepreserved;
@@ -81,6 +87,8 @@ public:
 		
 	CBuf(int s, bool icp) : iscasepreserved(icp), size(s), buf(std::string(size, 0)) {}
 	
+	unsigned char fgetc_buf(XFILE file);
+	bool ceof();
 	unsigned char fgetc_visible(XFILE file);
 	uint64_t eatnext(XFILE file);
 	unsigned char getnewest();
@@ -89,15 +97,36 @@ public:
 	unsigned char getith(size_t i);
 };
 
+unsigned char CBuf::fgetc_buf(XFILE file) {
+	if (bufidx + 1 < readsize) {
+		bufidx++;			
+		return buffer[bufidx];
+	} else {
+#if IS_INPUT_GZIPPED
+		readsize = gzread(file, buffer, BUFSIZE);
+#else
+		readsize = fread(buffer, sizeof(char), BUFSIZE, file);
+#endif	
+		// buffer[readsize] = EOF;
+		memset(&buffer[readsize], EOF, BUFSIZE-readsize+1);
+		bufidx = 0;
+		return buffer[bufidx];
+	}
+}
+
+bool CBuf::ceof() {
+	return bufidx + 1 >= readsize && readsize < BUFSIZE;
+}
+
 unsigned char CBuf::fgetc_visible(XFILE file) {
-	unsigned char ch = XGETC(file);
-	while (!XEOF(file) && ch < 33) {
-		ch = XGETC(file);
+	unsigned char ch = fgetc_buf(file);
+	while (!ceof() && ch < 33) {
+		ch = fgetc_buf(file);
 	}
 	if (!iscasepreserved) {
 		ch = toupper(ch);
 	}
-	assert(0 <= ch || XEOF(file));
+	assert(0 <= ch || ceof(file));
 	out = buf[idx];
 	buf[idx] = ch;
 	idx = (idx + 1) % size;
@@ -107,11 +136,11 @@ unsigned char CBuf::fgetc_visible(XFILE file) {
 uint64_t CBuf::eatnext(XFILE file) {
 	unsigned char ch2 = fgetc_visible(file);
 	if ('>' == ch2 || '@' == ch2) {
-		while (!XEOF(file) && (ch2 = XGETC(file)) != '\n'); // { printf("%c,", ch2); }
+		while (!ceof() && (ch2 = fgetc_buf(file)) != '\n'); // { printf("%c,", ch2); }
 		slen = 0;
 	} else if ('+' == ch2) {
 		for (unsigned int i = 0; i < 3; i++) {
-			while (!XEOF(file) && (ch2 = XGETC(file)) != '\n'); // { printf("(%u,%c), ", i, ch2); }
+			while (!ceof() && (ch2 = fgetc_buf(file)) != '\n'); // { printf("(%u,%c), ", i, ch2); }
 		}
 		slen = 0;
 	} else {

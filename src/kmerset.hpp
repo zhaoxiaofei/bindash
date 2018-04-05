@@ -43,7 +43,7 @@ void kmerset_init(Kmerset &kmerset, const char *fname, size_t kmerlen, bool isca
 	CBuf cbuf(kmerlen, iscasepreserved);
 	while (1) {
 		cbuf.eatnext(file);
-		if (XEOF(file)) { break; }
+		if (cbuf.ceof()) { break; }
 		if (kmerlen <= cbuf.slen) {
 			std::string kmer = cbuf.tostring();
 			if (!isstrandpreserved) {			
