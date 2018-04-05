@@ -127,9 +127,9 @@ int Sketchargs::write(std::string systime_began, std::string systime_ended) {
 		std::cerr << "Error: cannot open the file " << outfname << " for writing\n";
 		exit(-1);
 	}
+	file << "--COMMENT=program began at " << systime_began; // << "\n"; // no new line
+	file << "--COMMENT=program ended at " << systime_ended; // << "\n"; // no new line
 	file << "--COMMENT=revision " << (STR(GIT_COMMIT_HASH)) << " " << (STR((GIT_DIFF_SHORTSTAT))) << "\n";
-	file << "--COMMENT=program began at " << systime_began << "\n";
-	file << "--COMMENT=program ended at " << systime_ended << "\n";
 	file << "--bbits=" << bbits << "\n";
 	file << std::boolalpha << "--iscasepreserved=" << iscasepreserved << "\n";
 	file << std::boolalpha << "--isstrandpreserved=" << isstrandpreserved << "\n";
