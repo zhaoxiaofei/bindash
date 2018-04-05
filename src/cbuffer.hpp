@@ -126,7 +126,7 @@ unsigned char CBuf::fgetc_visible(XFILE file) {
 	if (!iscasepreserved) {
 		ch = toupper(ch);
 	}
-	assert(0 <= ch || ceof(file));
+	assert(0 <= ch || ceof());
 	out = buf[idx];
 	buf[idx] = ch;
 	idx = (idx + 1) % size;
