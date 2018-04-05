@@ -25,6 +25,7 @@
 
 //#include "kseq.h"
 
+#include <chrono>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -230,7 +231,7 @@ void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &en
 		}
 	}
 	std::cerr << "Distance calculation consumed " << (clock() - t) / CLOCKS_PER_SEC << " seconds." << std::endl;
-
+	
 	for (size_t i = 0; i < nthreads; i++) {
 		if (outfiles[i] != stdout) {
 			fclose(outfiles[i]);
@@ -240,8 +241,10 @@ void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &en
 
 
 int main(int argc, char **argv) {
-	std::cerr << argv[0] << " revision " << (STR(GIT_COMMIT_HASH)) << " " << (STR((GIT_DIFF_SHORTSTAT))) << std::endl;
+	std::chrono::system_clock::time_point systime_start = std::chrono::system_clock::now();
 	auto t = clock();
+	time_t systime_began1, systime_ended1;
+	std::cerr << argv[0] << " revision " << (STR(GIT_COMMIT_HASH)) << " " << (STR((GIT_DIFF_SHORTSTAT))) << std::endl;
 	if (argc < 2 || !strcmp("--help", argv[1])) { allusage(argc, argv); }
 	
 	if (!strcmp("exact", argv[1])) {
@@ -272,7 +275,12 @@ int main(int argc, char **argv) {
 			}
 		}
 		save_entities(entities, args.outfname);
-		args.write();
+		std::chrono::system_clock::time_point systime_end = std::chrono::system_clock::now();
+		systime_began1 = std::chrono::system_clock::to_time_t(systime_start);
+		systime_ended1 = std::chrono::system_clock::to_time_t(systime_end);
+		std::string systime_began2 = ctime(&systime_began1);
+		std::string systime_ended2 = ctime(&systime_ended1);	
+		args.write(systime_began2, systime_ended2);
 		std::cerr << "Hash initialization consumed " << (clock() - t) / CLOCKS_PER_SEC << " seconds" << std::endl;
 	} else if (!strcmp("dist", argv[1])) {
 		Distargs args;

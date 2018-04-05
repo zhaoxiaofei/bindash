@@ -63,7 +63,7 @@ public:
 	size_t sketchsize64 = 32;
 	Sketchargs() : outfname("sketch-at-time-" + std::to_string(time(NULL))) {}
 	int usage(const int argc, const char *const *argv);
-	int write();
+	int write(std::string systime_began, std::string systime_ended);
 	int parse(const int argc, const char *const *argv);
 	int read(std::string fname);
 private:
@@ -121,13 +121,15 @@ int Sketchargs::usage(const int argc, const char *const *argv) {
 	exit(1);
 }
 
-int Sketchargs::write() {
+int Sketchargs::write(std::string systime_began, std::string systime_ended) {
 	std::ofstream file(outfname, std::ios::out);
 	if (!file) {
 		std::cerr << "Error: cannot open the file " << outfname << " for writing\n";
 		exit(-1);
 	}
-	file << "--COMMENT=revision-" << (STR(GIT_COMMIT_HASH)) << " " << (STR((GIT_DIFF_SHORTSTAT))) << "\n";
+	file << "--COMMENT=revision " << (STR(GIT_COMMIT_HASH)) << " " << (STR((GIT_DIFF_SHORTSTAT))) << "\n";
+	file << "--COMMENT=program began at " << systime_began << "\n";
+	file << "--COMMENT=program ended at " << systime_ended << "\n";
 	file << "--bbits=" << bbits << "\n";
 	file << std::boolalpha << "--iscasepreserved=" << iscasepreserved << "\n";
 	file << std::boolalpha << "--isstrandpreserved=" << isstrandpreserved << "\n";
