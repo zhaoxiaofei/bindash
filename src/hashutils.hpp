@@ -28,6 +28,7 @@
 
 #define MEDIAN2X(data, n) ((data[(n-1)/2] + data[n/2]))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NBITS(x) (8*sizeof(x))
 
 //#define ORDER(a, b) if ((a) > (b)) { (a) = (a)^(b); (b) = (a)^(b); (a) = (a)^(b); }
@@ -42,11 +43,41 @@ void binsign(std::vector<uint64_t> &signs, const uint64_t sign, const size_t ske
 	uint64_t SIGN_BINSIZE = (SIGN_MOD + NBINS - 1ULL) / NBINS;
 	uint64_t binidx = sign / SIGN_BINSIZE;
 	assert(binidx < signs.size());
+#ifdef CANONICAL_DENSIFICATION
 	while (sign < signs[binidx]) {
 		signs[binidx] = sign;
 		if (0 == binidx) { break; }
 		binidx--;
 	}
+#else
+	signs[binidx] = MIN(signs[binidx], sign);
+#endif
+}
+
+uint64_t univhash2(uint64_t s, uint64_t t) {
+	uint64_t x = (1009) * s + (1000*1000+3) * t;
+	return (48271 * x + 11) % ((1ULL << 31) - 1);
+}
+
+int densifybin(std::vector<uint64_t> &signs) {
+	uint64_t minval = UINT64_MAX;
+	uint64_t maxval = 0;
+	for (auto sign : signs) { 
+		minval = MIN(minval, sign);
+		maxval = MAX(maxval, sign);
+	}
+	if (UINT64_MAX != maxval) { return 0; }
+	if (UINT64_MAX == minval) { return -1; }
+	for (uint64_t i = 0; i < signs.size(); i++) {
+		uint64_t j = i;
+		uint64_t nattempts = 0;
+		while (UINT64_MAX == signs[j]) {
+			j = univhash2(i, nattempts) % signs.size();
+			nattempts++;
+		}
+		signs[i] = signs[j];
+	}
+	return 1;
 }
 
 void ppush(std::priority_queue<uint64_t> &signqueue, std::set<uint64_t> &signset, uint64_t sign, const size_t sketchsize64) {

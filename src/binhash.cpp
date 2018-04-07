@@ -129,6 +129,10 @@ void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 			if (cbuf.ceof()) { break; }
 			hashupdate2(cbuf, signs, hf, hfrc, args.isstrandpreserved, args.sketchsize64);
 		}
+		int res = densifybin(signs);
+		if (res != 0) {
+			std::cerr << "Warning: the genome in " << fname << " is densified with flag " << res <<  std::endl;
+		}
 		genome_size = estimate_genome_size2(signs, args.sketchsize64);
 		fillusigs(entity, signs, args.bbits);
 	}
