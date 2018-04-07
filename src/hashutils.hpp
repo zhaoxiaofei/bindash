@@ -59,6 +59,15 @@ uint64_t univhash2(uint64_t s, uint64_t t) {
 	return (48271 * x + 11) % ((1ULL << 31) - 1);
 }
 
+
+/* This densitfication strategy is found at
+@article{shrivastava2017optimal,
+  title={Optimal densification for fast and accurate minwise hashing},
+  author={Shrivastava, Anshumali},
+  journal={arXiv preprint arXiv:1703.04664},
+  year={2017}
+}
+*/
 int densifybin(std::vector<uint64_t> &signs) {
 	uint64_t minval = UINT64_MAX;
 	uint64_t maxval = 0;
