@@ -35,14 +35,12 @@
 
 const uint64_t SIGN_MOD = (1ULL << 61ULL) - 1ULL; //1000000007; // (1ULL << 48ULL); // (1ULL << 49ULL) - 1ULL; // << (1L << 31L) - 1L; 
 
-uint64_t doublehash(uint64_t hash1, uint64_t hash2) { return (hash1 + hash2) % SIGN_MOD; }
+inline uint64_t doublehash(uint64_t hash1, uint64_t hash2) { return (hash1 + hash2) % SIGN_MOD; }
 
-void binsign(std::vector<uint64_t> &signs, const uint64_t sign, const size_t sketchsize64) {
+void binsign(std::vector<uint64_t> &signs, const uint64_t sign, const uint64_t binsize) {
 	// std::cerr << "binning " << sign << std::endl;
-	uint64_t NBINS = (sketchsize64 * NBITS(uint64_t));
-	uint64_t SIGN_BINSIZE = (SIGN_MOD + NBINS - 1ULL) / NBINS;
-	uint64_t binidx = sign / SIGN_BINSIZE;
-	assert(binidx < signs.size());
+	uint64_t binidx = sign / binsize;
+	// assert(binidx < signs.size());
 #ifdef CANONICAL_DENSIFICATION
 	while (sign < signs[binidx]) {
 		signs[binidx] = sign;
@@ -253,7 +251,7 @@ void hashinit2(CBuf & cbuf, CyclicHash<uint64_t> &hf, CyclicHash<uint64_t> &hfrc
 
 void hashupdate2(CBuf & cbuf, std::vector<uint64_t> &signs, 
 		CyclicHash<uint64_t> &hf, CyclicHash<uint64_t> &hfrc, 
-		bool isstranspreserved, size_t sketchsize64) {
+		bool isstranspreserved, uint64_t binsize) {
 	hf.update(cbuf.getout(), cbuf.getnewest());
 	hfrc.reverse_update(RCMAP[(int)cbuf.getnewest()], RCMAP[(int)cbuf.getout()]);
 	if (cbuf.slen >= cbuf.size) {
@@ -263,7 +261,7 @@ void hashupdate2(CBuf & cbuf, std::vector<uint64_t> &signs,
 			auto signval2 = hfrc.hashvalue % SIGN_MOD;
 			signval = doublehash(signval, signval2);
 		}
-		binsign(signs, signval, sketchsize64);
+		binsign(signs, signval, binsize);
 	}
 }
 

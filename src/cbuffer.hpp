@@ -76,6 +76,7 @@ private:
 	char buffer[BUFSIZE+1];
 	int bufidx = BUFSIZE;
 	int readsize = BUFSIZE;
+	XFILE file;
 public:
 	size_t idx = 0;
 	const bool iscasepreserved;
@@ -84,20 +85,29 @@ public:
 	uint64_t slen = 0;
 	std::string buf;
 	uint64_t chfreqs[256] = {0};
-		
-	CBuf(int s, bool icp) : iscasepreserved(icp), size(s), buf(std::string(size, 0)) {}
 	
-	unsigned char fgetc_buf(XFILE file);
+	CBuf(std::string fname, int s, bool icp) : iscasepreserved(icp), size(s), buf(std::string(size, 0)) {
+		file = XOPEN(fname.c_str(), "r");
+		if (NULL == file) {
+			fprintf(stderr, "Unable to open the file %s\n", fname.c_str());
+			exit(-1);
+		}
+	}
+	~CBuf(void) {
+		XCLOSE(file);
+	}
+	
+	unsigned char fgetc_buf();
 	bool ceof();
-	unsigned char fgetc_visible(XFILE file);
-	uint64_t eatnext(XFILE file);
+	unsigned char fgetc_visible();
+	uint64_t eatnext();
 	unsigned char getnewest();
 	unsigned char getout();
 	std::string tostring();
 	unsigned char getith(size_t i);
 };
 
-unsigned char CBuf::fgetc_buf(XFILE file) {
+unsigned char CBuf::fgetc_buf() {
 	if (bufidx + 1 < readsize) {
 		bufidx++;			
 		return buffer[bufidx];
@@ -118,10 +128,10 @@ bool CBuf::ceof() {
 	return bufidx + 1 >= readsize && readsize < BUFSIZE;
 }
 
-unsigned char CBuf::fgetc_visible(XFILE file) {
-	unsigned char ch = fgetc_buf(file);
+unsigned char CBuf::fgetc_visible() {
+	unsigned char ch = fgetc_buf();
 	while (!ceof() && ch < 33) {
-		ch = fgetc_buf(file);
+		ch = fgetc_buf();
 	}
 	if (!iscasepreserved) {
 		ch = toupper(ch);
@@ -133,14 +143,14 @@ unsigned char CBuf::fgetc_visible(XFILE file) {
 	return ch;
 };
 
-uint64_t CBuf::eatnext(XFILE file) {
-	unsigned char ch2 = fgetc_visible(file);
+uint64_t CBuf::eatnext() {
+	unsigned char ch2 = fgetc_visible();
 	if ('>' == ch2 || '@' == ch2) {
-		while (!ceof() && (ch2 = fgetc_buf(file)) != '\n'); // { printf("%c,", ch2); }
+		while (!ceof() && (ch2 = fgetc_buf()) != '\n'); // { printf("%c,", ch2); }
 		slen = 0;
 	} else if ('+' == ch2) {
 		for (unsigned int i = 0; i < 3; i++) {
-			while (!ceof() && (ch2 = fgetc_buf(file)) != '\n'); // { printf("(%u,%c), ", i, ch2); }
+			while (!ceof() && (ch2 = fgetc_buf()) != '\n'); // { printf("(%u,%c), ", i, ch2); }
 		}
 		slen = 0;
 	} else {

@@ -38,11 +38,9 @@ void revcomplement(std::string &rc, const std::string &fw) {
 
 void kmerset_init(Kmerset &kmerset, const char *fname, size_t kmerlen, bool iscasepreserved, bool isstrandpreserved) {
 	kmerset.name = fname;
-	XFILE file = XOPEN(fname, "r");
-	assert(file != NULL);
-	CBuf cbuf(kmerlen, iscasepreserved);
+	CBuf cbuf(fname, kmerlen, iscasepreserved);
 	while (1) {
-		cbuf.eatnext(file);
+		cbuf.eatnext();
 		if (cbuf.ceof()) { break; }
 		if (kmerlen <= cbuf.slen) {
 			std::string kmer = cbuf.tostring();
@@ -56,7 +54,6 @@ void kmerset_init(Kmerset &kmerset, const char *fname, size_t kmerlen, bool isca
 			kmerset.kmers.insert(kmer);
 		}
 	}
-	XCLOSE(file);
 	double entropy = bhmath_calc_entropy(cbuf.chfreqs, 256);
 	kmerset.matchprob = bhmath_matchprob(kmerlen, entropy, kmerset.kmers.size());
 }

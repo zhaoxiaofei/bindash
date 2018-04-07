@@ -48,25 +48,18 @@
 
 void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 	entity.name = fname;
-	uint64_t genome_size = 0;
-
-	XFILE file = XOPEN(fname, "r");
-	if (NULL == file) { 
-		std::cerr << "Unable to open the file " << fname << std::endl; 
-		exit(-1);
-	}
-	
+	uint64_t genome_size = 0;	
 	std::minstd_rand0 g1(args.randseed);
 	auto s1 = g1();
 	auto s2 = g1();
-	CBuf cbuf(args.kmerlen, args.iscasepreserved);
+	CBuf cbuf(fname, args.kmerlen, args.iscasepreserved);
 	
 	if (-1 == args.minhashtype) { // special perfect hash function for nucleotides
 		std::set<uint64_t, std::greater<uint64_t>> signset;
 		_DnaPerfectHash hf(args.kmerlen);
 		_DnaPerfectHash hfrc(args.kmerlen);
 		while (1) {
-			cbuf.eatnext(file);
+			cbuf.eatnext();
 			if (cbuf.ceof()) { break; }
 			hashupdateDna(cbuf, signset, hf, hfrc, args.isstrandpreserved);
 		}
@@ -79,7 +72,7 @@ void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 		CyclicHash<uint64_t> hfrc(args.kmerlen, s1, s2, 64);
 		hashinit0(cbuf, hf, hfrc, args.kmerlen);
 		while (1) {
-			cbuf.eatnext(file);
+			cbuf.eatnext();
 			if (cbuf.ceof()) { break; }
 			hashupdate0(cbuf, signqueue, signset, hf, hfrc, args.isstrandpreserved, args.sketchsize64);
 		}
@@ -112,22 +105,24 @@ void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 		}
 		hashinit1(cbuf, hfs, hfrcs, args.kmerlen, args.sketchsize64);
 		while (1) {
-			cbuf.eatnext(file);
+			cbuf.eatnext();
 			if (cbuf.ceof()) { break; }
 			hashupdate1(cbuf, signs, hfs, hfrcs, args.isstrandpreserved, args.sketchsize64);
 		}
 		genome_size = estimate_genome_size1(signs);	
 		fillusigs(entity, signs, args.bbits);
 	} else if (2 == args.minhashtype) { // multi binvals one hash function
+		const uint64_t nbins = args.sketchsize64 * NBITS(uint64_t);
+		const uint64_t binsize = (SIGN_MOD + nbins - 1ULL) / nbins;
 		entity.usigs = std::vector<uint64_t>(args.sketchsize64 * args.bbits, 0);
 		std::vector<uint64_t> signs(args.sketchsize64 * NBITS(uint64_t), UINT64_MAX); // carry over
 		CyclicHash<uint64_t> hf(args.kmerlen, s1, s2, 64);
 		CyclicHash<uint64_t> hfrc(args.kmerlen, s1, s2, 64);
 		hashinit2(cbuf, hf, hfrc, args.kmerlen);
 		while (1) {
-			cbuf.eatnext(file);
+			cbuf.eatnext();
 			if (cbuf.ceof()) { break; }
-			hashupdate2(cbuf, signs, hf, hfrc, args.isstrandpreserved, args.sketchsize64);
+			hashupdate2(cbuf, signs, hf, hfrc, args.isstrandpreserved, binsize);
 		}
 		int res = densifybin(signs);
 		if (res != 0) {
@@ -138,7 +133,6 @@ void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 	}
 	double entropy = bhmath_calc_entropy(cbuf.chfreqs, 256);
 	entity.matchprob = bhmath_matchprob(args.kmerlen, entropy, genome_size + 1);
-	XCLOSE(file);
 }
 
 int cmddist_print(FILE *outfile, const Entity &query, const Entity &target, double mutdist, size_t intersize,
