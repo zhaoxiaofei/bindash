@@ -46,19 +46,18 @@
 #include <string.h>
 #include <time.h>
 
-void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
-	entity.name = fname;
+void entity_init(Entity &entity, CBuf &cbuf, const std::string &entityname, const Sketchargs &args, const size_t nseqs = SIZE_MAX) {
+	entity.name = entityname;
 	uint64_t genome_size = 0;	
 	std::minstd_rand0 g1(args.randseed);
 	auto s1 = g1();
 	auto s2 = g1();
-	CBuf cbuf(fname, args.kmerlen, args.iscasepreserved);
-	
+		
 	if (-1 == args.minhashtype) { // special perfect hash function for nucleotides
 		std::set<uint64_t, std::greater<uint64_t>> signset;
 		_DnaPerfectHash hf(args.kmerlen);
 		_DnaPerfectHash hfrc(args.kmerlen);
-		while (1) {
+		while (cbuf.nseqs() < nseqs) {
 			cbuf.eatnext();
 			if (cbuf.ceof()) { break; }
 			hashupdateDna(cbuf, signset, hf, hfrc, args.isstrandpreserved);
@@ -71,7 +70,7 @@ void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 		CyclicHash<uint64_t> hf(args.kmerlen, s1, s2, 64);
 		CyclicHash<uint64_t> hfrc(args.kmerlen, s1, s2, 64);
 		hashinit0(cbuf, hf, hfrc, args.kmerlen);
-		while (1) {
+		while (cbuf.nseqs() < nseqs)  {
 			cbuf.eatnext();
 			if (cbuf.ceof()) { break; }
 			hashupdate0(cbuf, signqueue, signset, hf, hfrc, args.isstrandpreserved, args.sketchsize64);
@@ -104,7 +103,7 @@ void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 			hfrcs.push_back(hfrc);
 		}
 		hashinit1(cbuf, hfs, hfrcs, args.kmerlen, args.sketchsize64);
-		while (1) {
+		while (cbuf.nseqs() < nseqs) {
 			cbuf.eatnext();
 			if (cbuf.ceof()) { break; }
 			hashupdate1(cbuf, signs, hfs, hfrcs, args.isstrandpreserved, args.sketchsize64);
@@ -119,14 +118,14 @@ void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 		CyclicHash<uint64_t> hf(args.kmerlen, s1, s2, 64);
 		CyclicHash<uint64_t> hfrc(args.kmerlen, s1, s2, 64);
 		hashinit2(cbuf, hf, hfrc, args.kmerlen);
-		while (1) {
+		while (cbuf.nseqs() < nseqs) {
 			cbuf.eatnext();
 			if (cbuf.ceof()) { break; }
 			hashupdate2(cbuf, signs, hf, hfrc, args.isstrandpreserved, binsize);
 		}
 		int res = densifybin(signs);
 		if (res != 0) {
-			std::cerr << "Warning: the genome in " << fname << " is densified with flag " << res <<  std::endl;
+			std::cerr << "Warning: the genome " << entityname << " is densified with flag " << res <<  std::endl;
 		}
 		genome_size = estimate_genome_size2(signs, args.sketchsize64);
 		fillusigs(entity, signs, args.bbits);
@@ -134,6 +133,19 @@ void entity_init(Entity &entity, const char *fname, const Sketchargs &args) {
 	double entropy = bhmath_calc_entropy(cbuf.chfreqs, 256);
 	entity.matchprob = bhmath_matchprob(args.kmerlen, entropy, genome_size + 1);
 }
+
+#if 1
+void entities_init(std::vector<Entity> &entities, const char *fname, const Sketchargs &args, 
+		const std::vector<std::pair<size_t, size_t>> &entityid_to_count_vec,
+		const std::vector<std::string> &entityid_to_name) {
+	CBuf cbuf(fname, args.kmerlen, args.iscasepreserved);
+	for (auto entityid_to_count :  entityid_to_count_vec) {
+		size_t entityid = entityid_to_count.first;
+		size_t count = entityid_to_count.second;
+		entity_init(entities[entityid], cbuf, entityid_to_name[entityid], args, count);
+	}
+}
+#endif
 
 int cmddist_print(FILE *outfile, const Entity &query, const Entity &target, double mutdist, size_t intersize,
 		size_t sketchsize64, double mthres, double pthres, size_t raw_intersize, size_t raw_unionsize) {
@@ -260,13 +272,27 @@ int main(int argc, char **argv) {
 	} else if (!strcmp("sketch", argv[1])) {
 		Sketchargs args;
 		args.parse(argc, argv);	
-		std::vector<Entity> entities(args.infnames.size(), Entity());
+		
+		std::map<std::string, std::vector<std::pair<size_t, size_t>>> fname_to_entityid_count_list;
+		std::vector<std::string> entityid_to_entityname;
+		if (args.metafname != "") {	
+			parse_metaf(fname_to_entityid_count_list, entityid_to_entityname, args.metafname);
+		} else {
+			for (size_t s = 0; s < args.infnames.size(); s++) {
+				fname_to_entityid_count_list[args.infnames[s]] = std::vector<std::pair<size_t, size_t>>();
+				fname_to_entityid_count_list[args.infnames[s]].push_back(std::make_pair(s, SIZE_MAX));
+				entityid_to_entityname.push_back(args.infnames[s]);
+			}
+		}
+		// std::vector<Entity> entities(args.infnames.size(), Entity());
+		std::vector<Entity> entities(entityid_to_entityname.size(), Entity());	
 
 #if defined(_OPENMP)
 #pragma omp parallel for schedule(static, 1) num_threads((args.nthreads ? args.nthreads : omp_get_max_threads()))
 #endif
-		for (size_t i = 0; i < entities.size(); i++) {
-			entity_init(entities[i], args.infnames[i].c_str(), args);
+		for (size_t i = 0; i < args.infnames.size(); i++) {
+			entities_init(entities, args.infnames[i].c_str(), args, fname_to_entityid_count_list[ args.infnames[i] ], entityid_to_entityname);
+			// entity_init(entities[i], args.infnames[i], args);
 			if (0 == (i & (i + 1))) {
 				std::cerr << "Initialization of the first " <<  i + 1 << " entities consumed " << (clock()-t) / CLOCKS_PER_SEC << " seconds. " 
 				          << "The last sequence is converted into " << entities[i].usigs.size() << " 64-bit integers.\n";

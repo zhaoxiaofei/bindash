@@ -19,6 +19,8 @@
 
 #include <fstream>
 #include <iostream>
+#include <map>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -55,6 +57,7 @@ public:
 	bool iscasepreserved = false;
 	bool isstrandpreserved = false;
 	std::string listfname = "-";
+	std::string metafname = "";
 	size_t kmerlen = 21;
 	int minhashtype = 2;
 	size_t nthreads = 1;
@@ -101,6 +104,10 @@ int Sketchargs::usage(const int argc, const char *const *argv) {
 	std::cerr << "Options with [default values]:\n\n";
 	std::cerr << "  --help : Show this help message." << "\n\n";
 	std::cerr << "  --listfname: Name of the file, in which each line specifies a path to a sequence file. [" << listfname << "]\n\n";
+	std::cerr << "  --metafname: Name of the file associating consecutive sequences to genomes (including metagenome and pangenome).\n"
+	          << "    Each line of this file has the following format:\n"
+	          << "    \"Name-of-sequence-file(F) <TAB> [genome-name(G) <TAB> number-of-consecutive-sequences(N) ...]\".\n"
+	          << "    If not provided (empty string) then assume that each F is associated with exactly one G where F=G [" << metafname << "]\n\n";
 	std::cerr << "  --nthreads : This many threads will be spawned for processing. [" << nthreads << "]\n\n";
 	std::cerr << "  --minhashtype : Type of minhash.\n" 
 	          << "    -1 means perfect hash function for nucleotides where 5^(kmerlen) < 2^63.\n" 
@@ -110,10 +117,10 @@ int Sketchargs::usage(const int argc, const char *const *argv) {
 	std::cerr << "  --bbits : Number of bits kept as in b-bits minhash. [" << bbits << "]\n\n";
 	std::cerr << "  --kmerlen : K-mer length used to generate minhash values. [" << kmerlen << "]\n\n";
 	std::cerr << "  --sketchsize64 : Sketch size divided by 64, or equivalently,\n" 
-	              << "    the number of sets (each consisting of 64 minhash values) per genome). [" << sketchsize64 << "]\n\n";
+	          << "    the number of sets (each consisting of 64 minhash values) per genome). [" << sketchsize64 << "]\n\n";
 	std::cerr << "  --isstrandpreserved : Preserve strand, which means ignore reverse complement. [" << std::boolalpha << isstrandpreserved << "]\n\n";
 	std::cerr << "  --iscasepreserved : Preserve case, which means the lowercase and uppercase versions of the\n" 
-	           << "     same letter are treated as two different letters. [" << std::boolalpha << iscasepreserved << "]\n\n";
+	          << "    same letter are treated as two different letters. [" << std::boolalpha << iscasepreserved << "]\n\n";
 	std::cerr << "  --randseed : Seed to provide to the hash function. [" << randseed << "]." << "\n\n";
 	std::cerr << "  --outfname : Name of the file containing sketches as output [" << outfname << " (time-dependent)]." << "\n\n";
 	std::cerr << "Notes:\n\n";
@@ -135,6 +142,7 @@ int Sketchargs::write(std::string systime_began, std::string systime_ended) {
 	file << std::boolalpha << "--isstrandpreserved=" << isstrandpreserved << "\n";
 	file << "--kmerlen=" << kmerlen << "\n";
 	file << "--listfname=" << listfname << "\n";
+	file << "--metafname=" << metafname << "\n";
 	file << "--minhashtype=" << minhashtype << "\n";
 	file << "--nthreads=" << nthreads << "\n";
 	file << "--outfname=" << outfname << "\n";
@@ -212,6 +220,7 @@ int Sketchargs::_parse(std::string arg) {
 	else if ("--isstrandpreserved" == key) { issval >> std::boolalpha >> isstrandpreserved; }
 	else if ("--kmerlen" ==  key) { issval >> kmerlen; }
 	else if ("--listfname" ==  key) { issval >> listfname; }
+	else if ("--metafname" ==  key) { issval >> metafname; }
 	else if ("--minhashtype" ==  key) { issval >> minhashtype; }
 	else if ("--nthreads" == key) { issval >> nthreads; }
 	else if ("--outfname" == key) { issval >> outfname; }
@@ -229,6 +238,38 @@ int Sketchargs::_parse(std::string arg) {
 	}
 	return 0;
 }
+
+void parse_metaf(std::map<std::string, std::vector<std::pair<size_t, size_t>>> &fname_to_entityid_count_list, 
+		std::vector<std::string> entityid_to_entityname,
+		const std::string metafname) {
+	std::ifstream metafstream(metafname);
+	std::set<std::string> entitynames;
+	for (std::string line; std::getline(metafstream, line);) {
+		std::istringstream iss(line);
+		std::string fname;
+		std::getline(iss, fname, '\t');
+		assert(!iss.fail());
+		auto res = fname_to_entityid_count_list.insert(std::make_pair(fname, std::vector<std::pair<size_t, size_t>>()));
+		assert (res.second);
+		std::string entityname;
+		size_t nseqs;
+		while (!iss.fail()) {
+			std::getline(iss, entityname, '\t');
+			auto stat1 = iss.fail();
+			iss >> nseqs;
+			auto stat2 = iss.fail();
+			assert(stat1 == stat2);
+			auto res = entitynames.insert(entityname);
+			assert(res.second);
+			entityid_to_entityname.push_back(entityname);
+			auto entityid = entityid_to_entityname.size() - 1;
+			fname_to_entityid_count_list[fname].push_back(std::make_pair(entityid, nseqs));
+		}
+	}
+}
+
+// void const std::vector<std:pair<size_t, size_t>> &entityid_to_count_vec,
+//		const std::vector<std:pair<std::string> &entityid_to_name
 
 class Distargs {
 public:

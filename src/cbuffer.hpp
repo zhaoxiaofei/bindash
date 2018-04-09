@@ -77,6 +77,7 @@ private:
 	int bufidx = BUFSIZE;
 	int readsize = BUFSIZE;
 	XFILE file;
+	size_t _nseqs = 0;
 public:
 	size_t idx = 0;
 	const bool iscasepreserved;
@@ -85,7 +86,7 @@ public:
 	uint64_t slen = 0;
 	std::string buf;
 	uint64_t chfreqs[256] = {0};
-	
+		
 	CBuf(std::string fname, int s, bool icp) : iscasepreserved(icp), size(s), buf(std::string(size, 0)) {
 		file = XOPEN(fname.c_str(), "r");
 		if (NULL == file) {
@@ -97,6 +98,7 @@ public:
 		XCLOSE(file);
 	}
 	
+	size_t nseqs();
 	unsigned char fgetc_buf();
 	bool ceof();
 	unsigned char fgetc_visible();
@@ -106,6 +108,10 @@ public:
 	std::string tostring();
 	unsigned char getith(size_t i);
 };
+
+size_t CBuf::nseqs() {
+	return _nseqs;
+}
 
 unsigned char CBuf::fgetc_buf() {
 	if (bufidx + 1 < readsize) {
@@ -148,8 +154,9 @@ uint64_t CBuf::eatnext() {
 	if ('>' == ch2 || '@' == ch2) {
 		while (!ceof() && (ch2 = fgetc_buf()) != '\n'); // { printf("%c,", ch2); }
 		slen = 0;
+		_nseqs++;
 	} else if ('+' == ch2) {
-		for (unsigned int i = 0; i < 3; i++) {
+		for (unsigned int i = 0; i < 2; i++) {
 			while (!ceof() && (ch2 = fgetc_buf()) != '\n'); // { printf("(%u,%c), ", i, ch2); }
 		}
 		slen = 0;
@@ -158,7 +165,7 @@ uint64_t CBuf::eatnext() {
 		chfreqs[(unsigned int)ch2]++;
 	}
 	return slen;
-}
+};
 
 
 unsigned char CBuf::getith(size_t i) {
