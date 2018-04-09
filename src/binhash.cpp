@@ -134,18 +134,20 @@ void entity_init(Entity &entity, CBuf &cbuf, const std::string &entityname, cons
 	entity.matchprob = bhmath_matchprob(args.kmerlen, entropy, genome_size + 1);
 }
 
-#if 1
-void entities_init(std::vector<Entity> &entities, const char *fname, const Sketchargs &args, 
+void entities_init(std::vector<Entity> &entities, std::string fname, const Sketchargs &args, 
 		const std::vector<std::pair<size_t, size_t>> &entityid_to_count_vec,
 		const std::vector<std::string> &entityid_to_name) {
+	std::cerr << "Initiating fname " << fname << std::endl;
 	CBuf cbuf(fname, args.kmerlen, args.iscasepreserved);
+	size_t tot_nseqs = 0;
 	for (auto entityid_to_count :  entityid_to_count_vec) {
 		size_t entityid = entityid_to_count.first;
 		size_t count = entityid_to_count.second;
-		entity_init(entities[entityid], cbuf, entityid_to_name[entityid], args, count);
+		assert(count > 0);
+		tot_nseqs += count;
+		entity_init(entities[entityid], cbuf, entityid_to_name[entityid], args, tot_nseqs + 1);
 	}
 }
-#endif
 
 int cmddist_print(FILE *outfile, const Entity &query, const Entity &target, double mutdist, size_t intersize,
 		size_t sketchsize64, double mthres, double pthres, size_t raw_intersize, size_t raw_unionsize) {
@@ -273,25 +275,20 @@ int main(int argc, char **argv) {
 		Sketchargs args;
 		args.parse(argc, argv);	
 		
-		std::map<std::string, std::vector<std::pair<size_t, size_t>>> fname_to_entityid_count_list;
+		std::vector<std::vector<std::pair<size_t, size_t>>> fid_to_entityid_count_list;
+		std::vector<std::string> fid_to_fname;
 		std::vector<std::string> entityid_to_entityname;
-		if (args.metafname != "") {	
-			parse_metaf(fname_to_entityid_count_list, entityid_to_entityname, args.metafname);
-		} else {
-			for (size_t s = 0; s < args.infnames.size(); s++) {
-				fname_to_entityid_count_list[args.infnames[s]] = std::vector<std::pair<size_t, size_t>>();
-				fname_to_entityid_count_list[args.infnames[s]].push_back(std::make_pair(s, SIZE_MAX));
-				entityid_to_entityname.push_back(args.infnames[s]);
-			}
-		}
-		// std::vector<Entity> entities(args.infnames.size(), Entity());
-		std::vector<Entity> entities(entityid_to_entityname.size(), Entity());	
+		assert (0 < args.infnames.size());
+		// parse filecontents
+		parse_metaf(fid_to_entityid_count_list, fid_to_fname, entityid_to_entityname, args.infnames);
+		assert (fid_to_entityid_count_list.size() == fid_to_fname.size());
+		std::vector<Entity> entities(entityid_to_entityname.size(), Entity());
 
 #if defined(_OPENMP)
 #pragma omp parallel for schedule(static, 1) num_threads((args.nthreads ? args.nthreads : omp_get_max_threads()))
 #endif
-		for (size_t i = 0; i < args.infnames.size(); i++) {
-			entities_init(entities, args.infnames[i].c_str(), args, fname_to_entityid_count_list[ args.infnames[i] ], entityid_to_entityname);
+		for (size_t i = 0; i < fid_to_fname.size(); i++) {
+			entities_init(entities, fid_to_fname[i], args, fid_to_entityid_count_list[i], entityid_to_entityname);
 			// entity_init(entities[i], args.infnames[i], args);
 			if (0 == (i & (i + 1))) {
 				std::cerr << "Initialization of the first " <<  i + 1 << " entities consumed " << (clock()-t) / CLOCKS_PER_SEC << " seconds. " 

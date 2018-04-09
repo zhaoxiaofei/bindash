@@ -202,7 +202,7 @@ int Sketchargs::parse(const int argc, const char *const *argv) {
 		for (std::string line; std::getline(listfstream, line);) {
 			infnames.push_back(line);
 		}
-		listfstream.close();	
+		listfstream.close();
 	}
 	return 0;
 }
@@ -239,37 +239,52 @@ int Sketchargs::_parse(std::string arg) {
 	return 0;
 }
 
-void parse_metaf(std::map<std::string, std::vector<std::pair<size_t, size_t>>> &fname_to_entityid_count_list, 
-		std::vector<std::string> entityid_to_entityname,
-		const std::string metafname) {
-	std::ifstream metafstream(metafname);
+void parse_metaf(std::vector<std::vector<std::pair<size_t, size_t>>> &fid_to_entityid_count_list,
+		std::vector<std::string> &fid_to_fname,
+		std::vector<std::string> &entityid_to_entityname,
+		const std::vector<std::string> &infnames) {
+	
+	assert(0 == fid_to_entityid_count_list.size());
+	assert(0 == fid_to_fname.size());
+	assert(0 == entityid_to_entityname.size());
+	
 	std::set<std::string> entitynames;
-	for (std::string line; std::getline(metafstream, line);) {
-		std::istringstream iss(line);
+	for (size_t i = 0; i < infnames.size(); i++) {
+		std::istringstream iss(infnames[i]);
 		std::string fname;
 		std::getline(iss, fname, '\t');
 		assert(!iss.fail());
-		auto res = fname_to_entityid_count_list.insert(std::make_pair(fname, std::vector<std::pair<size_t, size_t>>()));
-		assert (res.second);
+		fid_to_fname.push_back(fname); // 
+		fid_to_entityid_count_list.push_back(std::vector<std::pair<size_t, size_t>>()); // 
 		std::string entityname;
 		size_t nseqs;
-		while (!iss.fail()) {
-			std::getline(iss, entityname, '\t');
+		while (std::getline(iss, entityname, '\t')) {
 			auto stat1 = iss.fail();
-			iss >> nseqs;
-			auto stat2 = iss.fail();
+			std::string nseqs_str;
+			std::getline(iss, nseqs_str, '\t');
+			std::istringstream iss2(nseqs_str);
+			iss2 >> nseqs;
+			assert(nseqs > 0);
+			auto stat2 = iss2.fail();
 			assert(stat1 == stat2);
+			// std::cerr << "Entity " << entityname << " is inserted." << std::endl;
 			auto res = entitynames.insert(entityname);
-			assert(res.second);
+			assert(res.second || !(std::cerr << entityname << " is duplicated." << std::endl));
+			auto entityid = entityid_to_entityname.size(); 	
 			entityid_to_entityname.push_back(entityname);
-			auto entityid = entityid_to_entityname.size() - 1;
-			fname_to_entityid_count_list[fname].push_back(std::make_pair(entityid, nseqs));
+			fid_to_entityid_count_list[i].push_back(std::make_pair(entityid, nseqs));
+		}
+		if (fid_to_entityid_count_list[i].size() == 0) {
+			entityname = fname;
+			auto res = entitynames.insert(entityname);
+			assert(res.second || !(std::cerr << entityname << " is duplicated." << std::endl));
+			auto entityid = entityid_to_entityname.size();
+			entityid_to_entityname.push_back(entityname);
+			fid_to_entityid_count_list[i].push_back(std::make_pair(entityid, nseqs));
 		}
 	}
+	assert(fid_to_entityid_count_list.size() == infnames.size());
 }
-
-// void const std::vector<std:pair<size_t, size_t>> &entityid_to_count_vec,
-//		const std::vector<std:pair<std::string> &entityid_to_name
 
 class Distargs {
 public:
