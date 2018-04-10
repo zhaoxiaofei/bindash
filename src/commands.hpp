@@ -284,7 +284,7 @@ void parse_metaf(std::vector<std::vector<std::pair<size_t, size_t>>> &fid_to_ent
 			}
 			auto entityid = entityid_to_entityname.size();
 			entityid_to_entityname.push_back(entityname);
-			fid_to_entityid_count_list[i].push_back(std::make_pair(entityid, nseqs));
+			fid_to_entityid_count_list[i].push_back(std::make_pair(entityid, SIZE_MAX - 1));
 		}
 	}
 	assert(fid_to_entityid_count_list.size() == infnames.size());

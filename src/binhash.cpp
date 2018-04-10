@@ -147,6 +147,10 @@ void entities_init(std::vector<Entity> &entities, std::string fname, const Sketc
 		tot_nseqs += count;
 		entity_init(entities[entityid], cbuf, entityid_to_name[entityid], args, tot_nseqs + 1);
 	}
+	if (tot_nseqs != cbuf.nseqs() && tot_nseqs != SIZE_MAX - 1) {
+		std::cerr << "Runtime error: file " << fname << " expects " << tot_nseqs << " sequences but actually has " << cbuf.nseqs() << " sequences!" << std::endl;
+		exit(-128);
+	}
 }
 
 int cmddist_print(FILE *outfile, const Entity &query, const Entity &target, double mutdist, size_t intersize,
