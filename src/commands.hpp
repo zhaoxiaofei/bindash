@@ -57,7 +57,6 @@ public:
 	bool iscasepreserved = false;
 	bool isstrandpreserved = false;
 	std::string listfname = "-";
-	std::string metafname = "";
 	size_t kmerlen = 21;
 	int minhashtype = 2;
 	size_t nthreads = 1;
@@ -103,11 +102,10 @@ int Sketchargs::usage(const int argc, const char *const *argv) {
 	          << "  Each filename specifies a path to a sequence file.\n\n";
 	std::cerr << "Options with [default values]:\n\n";
 	std::cerr << "  --help : Show this help message." << "\n\n";
-	std::cerr << "  --listfname: Name of the file, in which each line specifies a path to a sequence file. [" << listfname << "]\n\n";
-	std::cerr << "  --metafname: Name of the file associating consecutive sequences to genomes (including metagenome and pangenome).\n"
+	std::cerr << "  --listfname: Name of the file associating consecutive sequences to genomes (including metagenomes and pangenomes).\n"
 	          << "    Each line of this file has the following format:\n"
-	          << "    \"Name-of-sequence-file(F) <TAB> [genome-name(G) <TAB> number-of-consecutive-sequences(N) ...]\".\n"
-	          << "    If not provided (empty string) then assume that each F is associated with exactly one G where F=G [" << metafname << "]\n\n";
+	          << "    \"Path-to-a-sequence-file(F) <TAB> [genome-name(G) <TAB> number-of-consecutive-sequences(N) ...]\".\n"
+	          << "    If not provided (empty string) then assume that each F is associated with exactly one G where F=G [" << listfname << "]\n\n";
 	std::cerr << "  --nthreads : This many threads will be spawned for processing. [" << nthreads << "]\n\n";
 	std::cerr << "  --minhashtype : Type of minhash.\n" 
 	          << "    -1 means perfect hash function for nucleotides where 5^(kmerlen) < 2^63.\n" 
@@ -142,7 +140,6 @@ int Sketchargs::write(std::string systime_began, std::string systime_ended) {
 	file << std::boolalpha << "--isstrandpreserved=" << isstrandpreserved << "\n";
 	file << "--kmerlen=" << kmerlen << "\n";
 	file << "--listfname=" << listfname << "\n";
-	file << "--metafname=" << metafname << "\n";
 	file << "--minhashtype=" << minhashtype << "\n";
 	file << "--nthreads=" << nthreads << "\n";
 	file << "--outfname=" << outfname << "\n";
@@ -220,7 +217,6 @@ int Sketchargs::_parse(std::string arg) {
 	else if ("--isstrandpreserved" == key) { issval >> std::boolalpha >> isstrandpreserved; }
 	else if ("--kmerlen" ==  key) { issval >> kmerlen; }
 	else if ("--listfname" ==  key) { issval >> listfname; }
-	else if ("--metafname" ==  key) { issval >> metafname; }
 	else if ("--minhashtype" ==  key) { issval >> minhashtype; }
 	else if ("--nthreads" == key) { issval >> nthreads; }
 	else if ("--outfname" == key) { issval >> outfname; }
