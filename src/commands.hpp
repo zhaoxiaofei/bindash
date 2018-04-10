@@ -259,17 +259,18 @@ void parse_metaf(std::vector<std::vector<std::pair<size_t, size_t>>> &fid_to_ent
 		std::string entityname;
 		size_t nseqs;
 		while (std::getline(iss, entityname, '\t')) {
-			auto stat1 = iss.fail();
 			std::string nseqs_str;
 			std::getline(iss, nseqs_str, '\t');
 			std::istringstream iss2(nseqs_str);
 			iss2 >> nseqs;
 			assert(nseqs > 0);
-			auto stat2 = iss2.fail();
-			assert(stat1 == stat2);
+			assert(iss.fail() == iss2.fail());
 			// std::cerr << "Entity " << entityname << " is inserted." << std::endl;
 			auto res = entitynames.insert(entityname);
-			assert(res.second || !(std::cerr << entityname << " is duplicated." << std::endl));
+			if (!res.second) {
+				std::cerr << "The genome " << entityname << " is duplicated." << std::endl;
+				exit(-8);
+			}
 			auto entityid = entityid_to_entityname.size(); 	
 			entityid_to_entityname.push_back(entityname);
 			fid_to_entityid_count_list[i].push_back(std::make_pair(entityid, nseqs));
@@ -277,7 +278,10 @@ void parse_metaf(std::vector<std::vector<std::pair<size_t, size_t>>> &fid_to_ent
 		if (fid_to_entityid_count_list[i].size() == 0) {
 			entityname = fname;
 			auto res = entitynames.insert(entityname);
-			assert(res.second || !(std::cerr << entityname << " is duplicated." << std::endl));
+			if (!res.second) {
+				std::cerr << "The genome and the file " << entityname << " is duplicated." << std::endl;
+				exit(-16);
+			}
 			auto entityid = entityid_to_entityname.size();
 			entityid_to_entityname.push_back(entityname);
 			fid_to_entityid_count_list[i].push_back(std::make_pair(entityid, nseqs));

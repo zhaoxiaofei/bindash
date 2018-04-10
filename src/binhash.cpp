@@ -137,7 +137,7 @@ void entity_init(Entity &entity, CBuf &cbuf, const std::string &entityname, cons
 void entities_init(std::vector<Entity> &entities, std::string fname, const Sketchargs &args, 
 		const std::vector<std::pair<size_t, size_t>> &entityid_to_count_vec,
 		const std::vector<std::string> &entityid_to_name) {
-	std::cerr << "Initiating fname " << fname << std::endl;
+	// std::cerr << "Initiating fname " << fname << std::endl;
 	CBuf cbuf(fname, args.kmerlen, args.iscasepreserved);
 	size_t tot_nseqs = 0;
 	for (auto entityid_to_count :  entityid_to_count_vec) {
@@ -291,7 +291,7 @@ int main(int argc, char **argv) {
 			entities_init(entities, fid_to_fname[i], args, fid_to_entityid_count_list[i], entityid_to_entityname);
 			// entity_init(entities[i], args.infnames[i], args);
 			if (0 == (i & (i + 1))) {
-				std::cerr << "Initialization of the first " <<  i + 1 << " entities consumed " << (clock()-t) / CLOCKS_PER_SEC << " seconds. " 
+				std::cerr << "Sketching the first " <<  i + 1 << " files consumed " << (clock()-t) / CLOCKS_PER_SEC << " seconds. " 
 				          << "The last sequence is converted into " << entities[i].usigs.size() << " 64-bit integers.\n";
 			}
 		}
@@ -302,7 +302,7 @@ int main(int argc, char **argv) {
 		std::string systime_began2 = ctime(&systime_began1);
 		std::string systime_ended2 = ctime(&systime_ended1);	
 		args.write(systime_began2, systime_ended2);
-		std::cerr << "Hash initialization consumed " << (clock() - t) / CLOCKS_PER_SEC << " seconds" << std::endl;
+		std::cerr << "In total, sketching consumed " << (clock() - t) / CLOCKS_PER_SEC << " seconds" << std::endl;
 	} else if (!strcmp("dist", argv[1])) {
 		Distargs args;
 		args.parse(argc, argv);
