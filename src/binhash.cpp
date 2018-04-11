@@ -161,6 +161,13 @@ int cmddist_print(FILE *outfile, const Entity &query, const Entity &target, doub
 	double pvalue = bhmath_pbinom_tail(intersize, sketchsize64 * NBITS(uint64_t), p);
 	if (pvalue > pthres) { return 2; }
 	return fprintf(outfile, "%s\t%s\t%f\t%f\t%lu/%lu\n", query.name.c_str(), target.name.c_str(), mutdist, pvalue, raw_intersize, raw_unionsize);
+#if 0
+	char buffer[1024];
+	int seqlen = 1000; // snprintf(buffer, 1024, "%s\t%s\t%f\t%f\t%lu/%lu\n", query.name.c_str(), target.name.c_str(), mutdist, pvalue, raw_intersize, raw_unionsize);
+	int nchars = MIN(seqlen, 1024);
+	size_t ret = -1; // fwrite_unlocked(buffer, 1, nchars, outfile);
+	return ret;
+#endif
 }
 
 const char *ordinal_num_to_suffix(const size_t n) {
