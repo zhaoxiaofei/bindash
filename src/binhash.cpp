@@ -225,10 +225,11 @@ void cmddist(bool tCLUSTER, bool tNNEIGHBORS,
 if (!tNNEIGHBORS && CACHE_SIZE > 0 
 		// && nthreads > 1
 		) {
-	std::cerr << "Max number of genome comparions per cached data: " << CACHE_SIZE << "x" << CACHE_SIZE << std::endl;
-for (size_t i2 = 0; i2 < entities1.size(); i2 += CACHE_SIZE) {
-	size_t i2max = MIN(i2 + CACHE_SIZE, entities1.size());
-	for (size_t j2 = 0; j2 < entities2.size(); j2 += CACHE_SIZE) {
+	std::cerr << "Max number of genome comparions per cached data: " << 2*CACHE_SIZE << "x" << CACHE_SIZE << std::endl;
+for (size_t i2 = 0; i2 < entities1.size(); i2 += 2*CACHE_SIZE) {
+	size_t i2max = MIN(i2 + 2*CACHE_SIZE, entities1.size());
+	size_t j2start = (tCLUSTER ? (i2+0) : 0);
+	for (size_t j2 = j2start; j2 < entities2.size(); j2 += CACHE_SIZE) {
 		size_t j2max = MIN(j2 + CACHE_SIZE, entities2.size());
 
 #if defined(_OPENMP)
