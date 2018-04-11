@@ -180,9 +180,21 @@ const char *ordinal_num_to_suffix(const size_t n) {
 	abort();
 }
 
+/* TODO:
+ * Potential improvement to be made: CACHE_AWARE nearest neighbor search (may involve substantial additional coding).
+ */
+#define CACHE_SIZE (1024*8) // approximated
+
+#define DIST_IS_TEMPLATED 0
+#if DIST_IS_TEMPLATED
 template<bool tCLUSTER, bool tNNEIGHBORS>
-void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &entities2, 
-		const Sketchargs &args1, const Distargs &args) {
+void cmddist(
+#else
+void cmddist(bool tCLUSTER, bool tNNEIGHBORS,
+#endif
+		const std::vector<Entity> &entities1, const std::vector<Entity> &entities2, 
+		const Sketchargs &args1, const Distargs &args) 
+{
 
 	size_t nthreads = args.nthreads;
 	if (0 == nthreads) {
@@ -206,7 +218,44 @@ void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &en
 	}
 	std::vector<double> intersize_to_mutdist;
 	intersize_to_mutdist_init(intersize_to_mutdist, args1.sketchsize64, args1.kmerlen);
-	auto t = clock();	
+	auto t = clock();
+
+if (!tNNEIGHBORS && CACHE_SIZE > 0 && nthreads > 1) {
+
+for (size_t i2 = 0; i2 < entities1.size(); i2 += CACHE_SIZE) {
+	size_t i2max = MIN(i2 + CACHE_SIZE, entities1.size());
+	for (size_t j2 = 0; j2 < entities2.size(); j2 += CACHE_SIZE) {
+		size_t j2max = MIN(j2 + CACHE_SIZE, entities2.size());
+
+#if defined(_OPENMP)
+#pragma omp parallel for schedule(static, 1) num_threads(nthreads)
+#endif
+		for (size_t i = i2; i < i2max; i++) {
+			for (size_t j = (tCLUSTER ? MAX(i+1, j2) : j2); j < j2max; j++) {
+				size_t raw_intersize, raw_unionsize, intersize;
+				if (args1.minhashtype <= 0) {
+					intersize = calc_intersize0(raw_intersize, raw_unionsize, entities1[i], entities2[j], args1.sketchsize64);
+				} else {
+					intersize = calc_intersize12(entities1[i], entities2[j], args1.sketchsize64, args1.bbits);
+					raw_intersize = intersize;
+					raw_unionsize = NBITS(uint64_t) * args1.sketchsize64;
+				}
+				// const size_t interdiff = NBITS(uint64_t) * args1.sketchsize64 - intersize;
+				cmddist_print(outfiles[i%nthreads], entities1[i], entities2[j], intersize_to_mutdist[intersize], intersize,
+						args1.sketchsize64, args.mthres, args.pthres, raw_intersize, raw_unionsize);
+				
+			}
+		}	
+		if (0 == (i2 & (i2 + 1)) || 0 == (j2 & (j2+1))) {
+			std::cerr << "Processed cache chunk (" << i2 << "," << j2 << ") with size " << CACHE_SIZE << " in " 
+			          << (clock() - t) / CLOCKS_PER_SEC << " seconds." << std::endl;
+			// if (i2+1 == 1024*8) { exit(0); }
+		}
+
+	}
+}
+
+} else {
 
 #if defined(_OPENMP)
 #pragma omp parallel for schedule(static, 1) num_threads(nthreads)
@@ -251,8 +300,11 @@ void cmddist(const std::vector<Entity> &entities1, const std::vector<Entity> &en
 		}
 		if (0 == (i & (i + 1))) {
 			std::cerr << "Processed " << i + 1 << " queries in " << (clock() - t) / CLOCKS_PER_SEC << " seconds." << std::endl;
+			// if (i+1 == 1024*8) { exit(0); }
 		}
 	}
+}
+
 	std::cerr << "Distance calculation consumed " << (clock() - t) / CLOCKS_PER_SEC << " seconds." << std::endl;
 	
 	for (size_t i = 0; i < nthreads; i++) {
@@ -336,6 +388,7 @@ int main(int argc, char **argv) {
 
 		const bool tCLUSTER = (1 == args.infnames.size());
 		const bool tNNEIGHBORS = (0 < args.nneighbors);	
+#if DIST_IS_TEMPLATED
 		if (tCLUSTER && tNNEIGHBORS) {
 			cmddist<true, true>(entities1, entities1, args1, args);
 		} else if (!tCLUSTER && tNNEIGHBORS) {
@@ -345,6 +398,9 @@ int main(int argc, char **argv) {
 		} else {
 			cmddist<false, false>(entities1, entities2, args1, args);
 		}
+#else
+		cmddist(tCLUSTER, tNNEIGHBORS, entities1, entities1, args1, args);
+#endif
 	} else {
 		std::cerr << "Unrecognized command: " << argv[1] <<  "\n";
 		allusage(argc, argv);
