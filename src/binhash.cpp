@@ -183,7 +183,7 @@ const char *ordinal_num_to_suffix(const size_t n) {
 /* TODO:
  * Potential improvement to be made: CACHE_AWARE nearest neighbor search (may involve substantial additional coding).
  */
-#define CACHE_SIZE (1024*2) // approximated
+#define CACHE_SIZE (1024) // approximated
 
 #define DIST_IS_TEMPLATED 0
 #if DIST_IS_TEMPLATED
@@ -219,18 +219,20 @@ void cmddist(bool tCLUSTER, bool tNNEIGHBORS,
 	std::vector<double> intersize_to_mutdist;
 	intersize_to_mutdist_init(intersize_to_mutdist, args1.sketchsize64, args1.kmerlen);
 	auto t = clock();
+	time_t begtime, endtime;	
+	time(&begtime);
 
 if (!tNNEIGHBORS && CACHE_SIZE > 0 
 		// && nthreads > 1
 		) {
-
+	std::cerr << "Max number of genome comparions per cached data: " << CACHE_SIZE << "x" << CACHE_SIZE << std::endl;
 for (size_t i2 = 0; i2 < entities1.size(); i2 += CACHE_SIZE) {
 	size_t i2max = MIN(i2 + CACHE_SIZE, entities1.size());
 	for (size_t j2 = 0; j2 < entities2.size(); j2 += CACHE_SIZE) {
 		size_t j2max = MIN(j2 + CACHE_SIZE, entities2.size());
 
 #if defined(_OPENMP)
-#pragma omp parallel for schedule(dynamic, 1) num_threads(nthreads)
+#pragma omp parallel for schedule(static, 1) num_threads(nthreads)
 #endif
 		for (size_t i = i2; i < i2max; i++) {
 			for (size_t j = (tCLUSTER ? MAX(i+1, j2) : j2); j < j2max; j++) {
@@ -248,10 +250,11 @@ for (size_t i2 = 0; i2 < entities1.size(); i2 += CACHE_SIZE) {
 				
 			}
 		}
-		if (0 == (i2 & (i2 + 1)) || 0 == (j2 & (j2+1))) {
-			std::cerr << "Processed cache chunk (" << i2 << "," << j2 << ") with size " << CACHE_SIZE << " in " 
-			          << (clock() - t) / CLOCKS_PER_SEC << " seconds." << std::endl;
-			// if (i2+1 == 1024*8) { exit(0); }
+		if (0 == (i2max & (i2max-1)) && (0 == (j2max & (j2max-1)) || j2max == entities2.size())) {
+			time(&endtime);
+			std::cerr << "Processed up to the cached chunk at (" << i2max << "," << j2max << ") in "
+			          << (clock() - t) / CLOCKS_PER_SEC << " CPU seconds and "
+			          << difftime(endtime, begtime) << " wall-clock seconds." << std::endl;
 		}
 
 	}
