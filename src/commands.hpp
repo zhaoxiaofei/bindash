@@ -45,8 +45,9 @@ void allusage(const int argc, const char *const *argv) {
 	std::cerr << "  exact: estimate distance (and relevant statistics) between\n"
 	          << "    genomes corresponding to input files.\n\n";
 	std::cerr << "Notes:\n\n";
-	std::cerr << "  To see command-specific help, please enter\n"
-	          << "    " << argv[0] << " command --help\n\n";	
+	std::cerr << "  To see command-specific usage, please enter\n"
+	          << "    " << argv[0] << " command --help\n\n";
+	std::cerr << "  The format for options is --NAME=VALUE\n\n";	
 	exit(-2);
 }
 
@@ -105,7 +106,7 @@ int Sketchargs::usage(const int argc, const char *const *argv) {
 	std::cerr << "  --listfname: Name of the file associating consecutive sequences to genomes (including metagenomes and pangenomes).\n"
 	          << "    Each line of this file has the following format:\n"
 	          << "    \"Path-to-a-sequence-file(F) <TAB> [genome-name(G) <TAB> number-of-consecutive-sequences(N) ...]\".\n"
-	          << "    If not provided (empty string) then assume that each F is associated with exactly one G where F=G [" << listfname << "]\n\n";
+	          << "    If only F is provided, then use F as G and let N be the number of sequences in N [" << listfname << "]\n\n";
 	std::cerr << "  --nthreads : This many threads will be spawned for processing. [" << nthreads << "]\n\n";
 	std::cerr << "  --minhashtype : Type of minhash.\n" 
 	          << "    -1 means perfect hash function for nucleotides where 5^(kmerlen) < 2^63.\n" 
@@ -122,7 +123,10 @@ int Sketchargs::usage(const int argc, const char *const *argv) {
 	std::cerr << "  --randseed : Seed to provide to the hash function. [" << randseed << "]." << "\n\n";
 	std::cerr << "  --outfname : Name of the file containing sketches as output [" << outfname << " (time-dependent)]." << "\n\n";
 	std::cerr << "Notes:\n\n";
-	std::cerr << "  \"-\" (without quotes) means stdin.\n\n";
+	std::cerr << "  \"-\" (without quotes) means stdin.\n";
+	std::cerr << "  For general usage, please enter\n"
+	          << "    " << argv[0] << " --help\n\n";
+	std::cerr << "  The following is an example of options: --nthreads=8\n\n";
 	exit(1);
 }
 
@@ -323,6 +327,9 @@ int Distargs::usage(const int argc, const char *const *argv) {
 	          << "    then distance from genome A to genome B is the same as distance from B to A.\n"
 	          << "    In this case, only one record is reported per set of two genomes due to reflectivity.\n\n";
 	std::cerr << "  \"-\" (without quotes) means stdout.\n\n";
+	std::cerr << "  For general usage, please enter\n"
+	          << "    " << argv[0] << " --help\n\n";
+	std::cerr << "  The following is an example of options: --mthres=0.2\n\n";
 	exit(1);
 }
 
