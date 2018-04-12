@@ -60,7 +60,8 @@ void Entity::write(std::ofstream &binfile, std::ofstream &txtfile) {
 		// std::cerr << "\t" << std::hex << usig; if (i % 4 == 0) {std::cerr << std::endl;}; i++;
 		binfile.write((char*)&usig, sizeof(uint64_t));
 	}
-	txtfile << name << "\t" << matchprob << "\t" << usigs.size() << "\n";
+	txtfile << name << "\t" << std::scientific << matchprob << "\t";
+	txtfile << usigs.size() << "\n";
 }
 
 void save_entities(const std::vector<Entity> &entities, const std::string &outpname) {
