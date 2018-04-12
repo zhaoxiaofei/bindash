@@ -66,7 +66,7 @@ public:
 	size_t sketchsize64 = 32;
 	Sketchargs() : outfname("sketch-at-time-" + std::to_string(time(NULL))) {}
 	int usage(const int argc, const char *const *argv);
-	int write(std::string systime_began, std::string systime_ended);
+	int write(const std::string &systime_began, const std::string &systime_ended, size_t n_cpu_seconds);
 	int parse(const int argc, const char *const *argv);
 	int read(std::string fname);
 private:
@@ -130,7 +130,7 @@ int Sketchargs::usage(const int argc, const char *const *argv) {
 	exit(1);
 }
 
-int Sketchargs::write(std::string systime_began, std::string systime_ended) {
+int Sketchargs::write(const std::string &systime_began, const std::string &systime_ended, size_t n_cpu_seconds) {
 	std::ofstream file(outfname, std::ios::out);
 	if (!file) {
 		std::cerr << "Error: cannot open the file " << outfname << " for writing\n";
@@ -138,6 +138,7 @@ int Sketchargs::write(std::string systime_began, std::string systime_ended) {
 	}
 	file << "--COMMENT=program began at " << systime_began; // << "\n"; // no new line
 	file << "--COMMENT=program ended at " << systime_ended; // << "\n"; // no new line
+	file << "--COMMENT=program consumed " << n_cpu_seconds << " CPU seconds\n"; // << "\n"; // no new line
 	file << "--COMMENT=revision " << (STR(GIT_COMMIT_HASH)) << " " << (STR((GIT_DIFF_SHORTSTAT))) << "\n";
 	file << "--bbits=" << bbits << "\n";
 	file << std::boolalpha << "--iscasepreserved=" << iscasepreserved << "\n";
@@ -292,7 +293,6 @@ void parse_metaf(std::vector<std::vector<std::pair<size_t, size_t>>> &fid_to_ent
 
 class Distargs {
 public:
-	const std::string suffix = "Thread";
 	std::vector<std::string> infnames;
 	double mthres = 2.5;
 	size_t nneighbors = 0;
@@ -317,9 +317,8 @@ int Distargs::usage(const int argc, const char *const *argv) {
 	std::cerr << "  --nneighbors : Only this number of best-hit results per query are reported.\n" 
 	          << "    If this value is zero then report all. [" << nneighbors << "].\n\n";
 	std::cerr << "  --nthreads : This many threads will be spawned for processing. [" << nthreads << "]\n\n";
-	std::cerr << "  --outfname : Prefix(es) of the output file(s) containing comparison between query and target.\n"
-	          << "    The file name ends with the suffix \"" << suffix << "\" (not applicable to stdout).\n"
-	          << "    The file contains the following tab-separated fields per result line:\n"
+	std::cerr << "  --outfname : The output file comparing the query and target sketches.\n"
+	          << "    The ouput file contains the following tab-separated fields per result line:\n"
 	          << "    query-sketch, target-sketch, mutation-distance, p-value, and jaccard-index. [" << outfname << "].\n\n";
 	std::cerr << "  --pthres : only results with at most this p-value are reported. [" << pthres << "]\n\n";
 	std::cerr << "Note:\n\n";
