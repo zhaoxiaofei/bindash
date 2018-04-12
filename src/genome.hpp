@@ -17,6 +17,8 @@
 #ifndef SIGNATURE_HPP
 #define SIGNATURE_HPP
 
+#include "libpopcnt-2.2/libpopcnt.h"
+
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -173,7 +175,7 @@ const size_t calc_intersize12(const Entity &e1, const Entity &e2, const size_t s
 			bits &= ~(e1.usigs[i * bbits + j] ^ e2.usigs[i * bbits + j]);
 			// std::cout << " bits = " << std::hex << bits << std::endl;
 		}
-		samebits += __builtin_popcountll(bits);
+		samebits += popcnt(&bits, sizeof(uint64_t)); // uses  __builtin_popcountll(bits) on most architectures;
 	}
 	// std::cout << " samebits = " << std::hex << samebits << std::endl;
 	size_t expected_samebits = ((sketchsize64 * NBITS(uint64_t)) >> bbits);
