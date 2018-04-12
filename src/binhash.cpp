@@ -46,6 +46,13 @@
 #include <string.h>
 #include <time.h>
 
+/* TODO:
+ * Potential improvement to be made: CACHE_AWARE nearest neighbor search (may involve substantial additional coding).
+ */
+#define CACHE_SIZE (1024) // approximated
+#define ISIZE  (2 * CACHE_SIZE)
+#define LINELEN_MAX (1024)
+
 void entity_init(Entity &entity, CBuf &cbuf, const std::string &entityname, const Sketchargs &args, const size_t nseqs = SIZE_MAX) {
 	entity.name = entityname;
 	uint64_t genome_size = 0;	
@@ -153,6 +160,28 @@ void entities_init(std::vector<Entity> &entities, std::string fname, const Sketc
 	}
 }
 
+size_t cmddist_buffer(char *&buffer, size_t &buffer_size, size_t &buffer_maxsize,
+		const Entity &query, const Entity &target, double mutdist, size_t intersize,
+		size_t sketchsize64, double mthres, double pthres, size_t raw_intersize, size_t raw_unionsize) {
+	if (mutdist > mthres) { return 1; }
+	double andprob = query.matchprob * target.matchprob;
+	double p = andprob / (query.matchprob + target.matchprob - andprob);
+	double pvalue = bhmath_pbinom_tail(intersize, sketchsize64 * NBITS(uint64_t), p);
+	if (pvalue > pthres) { return 2; }
+	assert (buffer_maxsize >= LINELEN_MAX);
+	if (buffer_size + LINELEN_MAX >= buffer_maxsize) {
+		buffer_maxsize *= 2;
+		char *nextbuffer = (char*)realloc(buffer, buffer_maxsize);
+		assert(nextbuffer);
+		buffer = nextbuffer;
+	}
+	int inc = snprintf(&buffer[buffer_size], LINELEN_MAX, "%s\t%s\t%f\t%f\t%lu/%lu\n", query.name.c_str(), target.name.c_str(), mutdist, pvalue, raw_intersize, raw_unionsize);
+	assert(inc < LINELEN_MAX);
+	assert(inc > 0);
+	buffer_size += inc;
+	return inc;
+}
+
 int cmddist_print(FILE *outfile, const Entity &query, const Entity &target, double mutdist, size_t intersize,
 		size_t sketchsize64, double mthres, double pthres, size_t raw_intersize, size_t raw_unionsize) {
 	if (mutdist > mthres) { return 1; }
@@ -162,9 +191,9 @@ int cmddist_print(FILE *outfile, const Entity &query, const Entity &target, doub
 	if (pvalue > pthres) { return 2; }
 	return fprintf(outfile, "%s\t%s\t%f\t%f\t%lu/%lu\n", query.name.c_str(), target.name.c_str(), mutdist, pvalue, raw_intersize, raw_unionsize);
 #if 0
-	char buffer[1024];
-	int seqlen = 1000; // snprintf(buffer, 1024, "%s\t%s\t%f\t%f\t%lu/%lu\n", query.name.c_str(), target.name.c_str(), mutdist, pvalue, raw_intersize, raw_unionsize);
-	int nchars = MIN(seqlen, 1024);
+	char buffer[1001];
+	int seqlen = 1001; // snprintf(buffer, 1001, "%s\t%s\t%f\t%f\t%lu/%lu\n", query.name.c_str(), target.name.c_str(), mutdist, pvalue, raw_intersize, raw_unionsize);
+	int nchars = MIN(seqlen, 1001);
 	size_t ret = -1; // fwrite_unlocked(buffer, 1, nchars, outfile);
 	return ret;
 #endif
@@ -179,11 +208,6 @@ const char *ordinal_num_to_suffix(const size_t n) {
 	if (n % 10 == 3) { return "rd"; }
 	abort();
 }
-
-/* TODO:
- * Potential improvement to be made: CACHE_AWARE nearest neighbor search (may involve substantial additional coding).
- */
-#define CACHE_SIZE (1024) // approximated
 
 #define DIST_IS_TEMPLATED 0
 #if DIST_IS_TEMPLATED
@@ -225,15 +249,28 @@ void cmddist(bool tCLUSTER, bool tNNEIGHBORS,
 if (!tNNEIGHBORS && CACHE_SIZE > 0 
 		// && nthreads > 1
 		) {
-	std::cerr << "Max number of genome comparions per cached data: " << 2*CACHE_SIZE << "x" << CACHE_SIZE << std::endl;
-for (size_t i2 = 0; i2 < entities1.size(); i2 += 2*CACHE_SIZE) {
-	size_t i2max = MIN(i2 + 2*CACHE_SIZE, entities1.size());
+
+std::cerr << "Max number of genome comparions per cached data: " << ISIZE << "x" << CACHE_SIZE << std::endl;
+
+size_t buffer_sizes[ISIZE];
+size_t buffer_maxsizes[ISIZE];
+char *buffers[ISIZE];
+
+for (size_t i = 0; i < ISIZE; i++) {
+	buffers[i] = (char*)malloc(LINELEN_MAX);
+	assert(buffers[i]);
+	buffer_sizes[i] = 0;
+	buffer_maxsizes[i] = LINELEN_MAX;
+}
+
+for (size_t i2 = 0; i2 < entities1.size(); i2 += ISIZE) {
+	size_t i2max = MIN(i2 + ISIZE, entities1.size());
 	size_t j2start = (tCLUSTER ? (i2+0) : 0);
 	for (size_t j2 = j2start; j2 < entities2.size(); j2 += CACHE_SIZE) {
-		size_t j2max = MIN(j2 + CACHE_SIZE, entities2.size());
-
+			size_t j2max = MIN(j2 + CACHE_SIZE, entities2.size());
+		
 #if defined(_OPENMP)
-#pragma omp parallel for schedule(static, 1) num_threads(nthreads)
+#pragma omp parallel for schedule(dynamic, 1) num_threads(nthreads)
 #endif
 		for (size_t i = i2; i < i2max; i++) {
 			for (size_t j = (tCLUSTER ? MAX(i+1, j2) : j2); j < j2max; j++) {
@@ -246,18 +283,32 @@ for (size_t i2 = 0; i2 < entities1.size(); i2 += 2*CACHE_SIZE) {
 					raw_unionsize = NBITS(uint64_t) * args1.sketchsize64;
 				}
 				// const size_t interdiff = NBITS(uint64_t) * args1.sketchsize64 - intersize;
-				cmddist_print(outfiles[i%nthreads], entities1[i], entities2[j], intersize_to_mutdist[intersize], intersize,
+				assert(i - i2 < ISIZE);
+				cmddist_buffer(buffers[i-i2], buffer_sizes[i-i2], buffer_maxsizes[i-i2],
+						entities1[i], entities2[j], intersize_to_mutdist[intersize], intersize,
 						args1.sketchsize64, args.mthres, args.pthres, raw_intersize, raw_unionsize);
-				
+				//cmddist_print(outfiles[i%nthreads], entities1[i], entities2[j], intersize_to_mutdist[intersize], intersize,
+				//		args1.sketchsize64, args.mthres, args.pthres, raw_intersize, raw_unionsize);
 			}
 		}
+		
 		if (0 == (i2max & (i2max-1)) && (0 == (j2max & (j2max-1)) || j2max == entities2.size())) {
 			time(&endtime);
 			std::cerr << "Processed up to the cached chunk at (" << i2max << "," << j2max << ") in "
 			          << (clock() - t) / CLOCKS_PER_SEC << " CPU seconds and "
 			          << difftime(endtime, begtime) << " wall-clock seconds." << std::endl;
-		}
+		}		
 
+		for (size_t i = i2; i < i2max; i++) {
+			size_t iter = i - i2;
+			size_t nchars = fwrite(buffers[iter], 1, buffer_maxsizes[iter], outfiles[0]);
+			if (buffer_maxsizes[iter] != nchars) { 
+				std::cerr << "Expect to write " << buffer_maxsizes[iter] << " but actually wrote " << nchars << std::endl;
+ 				exit(1);
+			}
+			buffer_sizes[i-i2] = 0;
+			buffer_maxsizes[i-i2] = LINELEN_MAX;
+		}	
 	}
 }
 
