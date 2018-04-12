@@ -43,7 +43,7 @@ double bhmath_calc_entropy(const uint64_t *freqs, size_t n) {
 }
 
 double bhmath_matchprob(unsigned int kmerlen, double entropy, uint64_t genomesize) {
-	double delta = pow(exp(entropy), -kmerlen);
+	double delta = pow(1.0 / exp(entropy), kmerlen);
 	// return 1 - pow(1 - delta, genomesize)
 	// return 1 - pow(1 + delta, -genomesize)
 	// return 1 - pow(1 + delta, 1 / delta * delta * -genomesize)
