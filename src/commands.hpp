@@ -54,7 +54,7 @@ void allusage(const int argc, const char *const *argv) {
 class Sketchargs {
 public:
 	std::vector<std::string> infnames;
-	size_t bbits = 13; // 2; // = log2(64 * sketchsize64) TODO: find theoretical justification
+	size_t bbits = 14; // 2; // = log2(64 * sketchsize64) TODO: find theoretical justification
 	bool iscasepreserved = false;
 	bool isstrandpreserved = false;
 	std::string listfname = "-";
