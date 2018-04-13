@@ -21,8 +21,8 @@ exp_diff_list = []
 for genome_pair in expected:
 	jexp = expected[genome_pair]
 	jobs = observed[genome_pair]
-	diff = jexp - jobs
-	exp_diff_list.append((jexp, diff * diff))
+	diff = jobs - jexp
+	exp_diff_list.append((jexp, diff))
 exp_diff_list = sorted(exp_diff_list)
 for exp, diff in exp_diff_list:
 	print('{}\t{}'.format(exp, diff))
