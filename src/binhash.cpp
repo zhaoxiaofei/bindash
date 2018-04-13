@@ -194,8 +194,12 @@ int cmddist_filter(double &mutdist, double &pvalue,
 		intersize = calc_intersize0(raw_intersize, raw_unionsize, query, target, args1.sketchsize64);
 	} else {
 		intersize = calc_intersize12(query, target, args1.sketchsize64, args1.bbits);
-		raw_intersize = intersize;
 		raw_unionsize = NBITS(uint64_t) * args1.sketchsize64;
+		if (intersize < args2.ithres) {
+			raw_unionsize -= intersize;
+			intersize = 0;
+		}
+		raw_intersize = intersize;
 	}
 	
 	mutdist = intersize_to_mutdist[intersize];
@@ -203,9 +207,9 @@ int cmddist_filter(double &mutdist, double &pvalue,
 	if (0 < intersize) {
 		double andprob = query.matchprob * target.matchprob;
 		double p = andprob / (query.matchprob + target.matchprob - andprob);
-		pvalue = bhmath_pbinom_tail(intersize, args1.sketchsize64 * NBITS(uint64_t), p);
+		pvalue = bhmath_pbinom_tail(raw_intersize, raw_unionsize, p);
 	} else {
-		pvalue = 1;
+		pvalue = 1.0;
 	}
 	if (pvalue > args2.pthres) { return 2; }
 	// fprintf(stderr, "bhmath_pbinom_tail(%u, %u, %.4e) == %.4e\n", intersize, args1.sketchsize64 * NBITS(uint64_t), p, pvalue);

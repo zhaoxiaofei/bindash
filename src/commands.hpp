@@ -54,7 +54,7 @@ void allusage(const int argc, const char *const *argv) {
 class Sketchargs {
 public:
 	std::vector<std::string> infnames;
-	size_t bbits = 11; // 2; // = log2(64 * sketchsize64)
+	size_t bbits = 13; // 2; // = log2(64 * sketchsize64) TODO: find theoretical justification
 	bool iscasepreserved = false;
 	bool isstrandpreserved = false;
 	std::string listfname = "-";
@@ -294,6 +294,7 @@ void parse_metaf(std::vector<std::vector<std::pair<size_t, size_t>>> &fid_to_ent
 class Distargs {
 public:
 	std::vector<std::string> infnames;
+	size_t ithres = 2;
 	double mthres = 2.5;
 	size_t nneighbors = 0;
 	size_t nthreads = 1;
@@ -313,6 +314,8 @@ int Distargs::usage(const int argc, const char *const *argv) {
 	          << "    If target-sketch is omitted, then query-sketch is used as both query and target.\n\n";
 	std::cerr << "Options:\n\n";
 	std::cerr << "  --help : Show this help message." << "\n\n";
+	std::cerr << "  --ithres : If intersection(A, B) has less than this number of elements,"
+	          << "    then set the intersection to empty set so that the resulting Jaccard-index is zero. [" << ithres << "]\n\n";
 	std::cerr << "  --mthres : Only results with at most this mutation distance are reported [" << mthres << "]\n\n";
 	std::cerr << "  --nneighbors : Only this number of best-hit results per query are reported.\n" 
 	          << "    If this value is zero then report all. [" << nneighbors << "].\n\n";
@@ -340,6 +343,7 @@ int Distargs::_parse(std::string arg) {
 	std::getline(iss, val);
 	std::istringstream issval(val);
 	if (arg.find("--help", 0) == 0) { return 1; }
+	else if ("--ithres" == key) { issval >> ithres; }
 	else if ("--mthres" == key) { issval >> mthres; }
 	else if ("--nneighbors" == key) { issval >> nneighbors; }
 	else if ("--nthreads" ==  key) { issval >> nthreads; }

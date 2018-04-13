@@ -179,9 +179,11 @@ const size_t calc_intersize12(const Entity &e1, const Entity &e2, const size_t s
 		samebits += popcnt(&bits, sizeof(uint64_t)); // uses  __builtin_popcountll(bits) on most architectures;
 	}
 	// std::cout << " samebits = " << std::hex << samebits << std::endl;
-	size_t expected_samebits = ((sketchsize64 * NBITS(uint64_t)) >> bbits);
-	return non_neg_minus(samebits, expected_samebits);
-
+	size_t maxnbits = sketchsize64 * NBITS(uint64_t); 
+	size_t expected_samebits = (maxnbits >> bbits);
+	size_t ret = non_neg_minus(samebits, expected_samebits);
+	return ret * maxnbits / (maxnbits - expected_samebits);
+	
 #if 0 // This commented-out code works but has lots of complexity that is not justified so far
 	// return sketchsize64 * NBITS(uint64_t) - samebits;
 	size_t diffbits = sketchsize64 * NBITS(uint64_t) - samebits;
