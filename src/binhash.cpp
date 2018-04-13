@@ -200,10 +200,13 @@ int cmddist_filter(double &mutdist, double &pvalue,
 	
 	mutdist = intersize_to_mutdist[intersize];
 	if (mutdist > args2.mthres) { return 1; }
-	
-	double andprob = query.matchprob * target.matchprob;
-	double p = andprob / (query.matchprob + target.matchprob - andprob);
-	pvalue = bhmath_pbinom_tail(intersize, args1.sketchsize64 * NBITS(uint64_t), p);
+	if (0 < intersize) {
+		double andprob = query.matchprob * target.matchprob;
+		double p = andprob / (query.matchprob + target.matchprob - andprob);
+		pvalue = bhmath_pbinom_tail(intersize, args1.sketchsize64 * NBITS(uint64_t), p);
+	} else {
+		pvalue = 1;
+	}
 	if (pvalue > args2.pthres) { return 2; }
 	// fprintf(stderr, "bhmath_pbinom_tail(%u, %u, %.4e) == %.4e\n", intersize, args1.sketchsize64 * NBITS(uint64_t), p, pvalue);
 
