@@ -12,15 +12,11 @@ Dependencies:
  
 How to install:
 
-cd ${PROJECT_ROOT_DIRECTORY}
-
-mkdir release && cd release
-
-cmake -DCMAKE_BUILD_TYPE=Release ..
-
-make
-
-./binhash --help # to see a general help message
+cd ${PROJECT_ROOT_DIRECTORY}  
+mkdir release && cd release  
+cmake -DCMAKE_BUILD_TYPE=Release ..  
+make  
+./binhash --help # to see a general help message   
 
 
 Author: XiaoFei Zhao
