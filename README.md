@@ -19,5 +19,5 @@ make
 ./binhash --help # to see a general help message   
 
 
-Author: XiaoFei Zhao (cndfeifei@hotmail.com)  
+Author: XiaoFei Zhao (cndfeifei AT hotmail DOT com)  
 License: Apache 2.0
