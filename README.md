@@ -1,4 +1,4 @@
-# binhash
+# BinHash
 Fast and precise comparison of genomes and metagenomes (in the order of terabytes) on a typical personal laptop
 
 BinHash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. 
@@ -13,8 +13,11 @@ Dependencies:
 How to install:
 
 cd ${PROJECT_ROOT_DIRECTORY}
+
 mkdir release && cd release
+
 cmake -DCMAKE_BUILD_TYPE=Release ..
+
 ./binhash --help # to see a general help message
 
 
