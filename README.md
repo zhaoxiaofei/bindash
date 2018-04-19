@@ -7,7 +7,7 @@ BinHash can handle sequences consisting of terabytes of input data (gzipped or n
  
 Dependencies:
  - any C++ compiler supporting the C++11 standard
- - CMake version 2.6
+ - CMake version 2.6 or plus
  - zlib 
  
 How to install:
