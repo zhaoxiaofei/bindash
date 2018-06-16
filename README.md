@@ -1,5 +1,5 @@
 
-BinHash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. 
+BinDash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. 
 It is extremely fast and memory efficient.
 It can handle sequences consisting of terabytes of input data (gzipped or not, in fasta or fastq format). 
 
@@ -15,16 +15,19 @@ cd ${PROJECT_ROOT_DIRECTORY}
 mkdir release && cd release  
 cmake -DCMAKE_BUILD_TYPE=Release ..  
 make  
-./binhash --help # to see a general help message   
+./bindash --help # to see a general help message   
 
 # How to run:
 
-The folowing three commands show how to run BinHash:
->> binhash sketch --outfname=genomeA.sketch genomeA.fasta
->> binhash sketch --outfname=genomeB.sketch genomeB.fasta
->> binhash dist genomeA.sketch genomeB.sketch # print to stdout 
+The folowing three commands show how to run BinDash:
 
-The output of "binhash dist" consists of several lines. 
+\>\> bindash sketch --outfname=genomeA.sketch genomeA.fasta
+
+\>\> bindash sketch --outfname=genomeB.sketch genomeB.fasta
+
+\>\> bindash dist genomeA.sketch genomeB.sketch # print to stdout 
+
+The output of "bindash dist" consists of several lines. 
 Each line has these five tab-separated fields: 
  - query genome (Q)
  - target genome (T) 
@@ -32,9 +35,9 @@ Each line has these five tab-separated fields:
  - p-value for the mutation distance
  - Jaccard Index between Q and T
 
-# How BinHash works:
+# How BinDash works:
 
-By default, BinHash uses the optimally densified MinHash proposed by Shrivastava. This MinHash technique allows for efficient compression and fast comparison. 
+By default, BinDash uses the optimally densified MinHash proposed by Shrivastava. This MinHash technique allows for efficient compression and fast comparison. 
 
 Basically, compression of a genome is done as follows.
  1. All k-mers of each genome are selected and then transformed into hash values.
