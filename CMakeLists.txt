@@ -1,11 +1,11 @@
 cmake_minimum_required (VERSION 2.6)
-project (binhash)
+project (bindash)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall")
 set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast -fopenmp") # fast floating point arithmetics
-add_executable (binhash ./src/binhash.cpp)
-target_link_libraries(binhash -lm)
-target_link_libraries(binhash -lz)
+add_executable (bindash ./src/bindash.cpp)
+target_link_libraries(bindash -lm)
+target_link_libraries(bindash -lz)
 
 # Get the latest abbreviated commit hash of the working branch
 execute_process(
