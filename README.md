@@ -10,19 +10,21 @@ It can handle sequences consisting of terabytes of input data (gzipped or not, i
  - zlib 
  
 # How to install:
-
+```sh
 cd ${PROJECT_ROOT_DIRECTORY}  
 mkdir release && cd release  
 cmake -DCMAKE_BUILD_TYPE=Release ..  
 make  
 ./binhash --help # to see a general help message   
-
+```
 # How to run:
 
 The folowing three commands show how to run BinHash:
->> binhash sketch --outfname=genomeA.sketch genomeA.fasta
->> binhash sketch --outfname=genomeB.sketch genomeB.fasta
->> binhash dist genomeA.sketch genomeB.sketch # print to stdout 
+```sh
+binhash sketch --outfname=genomeA.sketch genomeA.fasta
+binhash sketch --outfname=genomeB.sketch genomeB.fasta
+binhash dist genomeA.sketch genomeB.sketch # print to stdout
+```
 
 The output of "binhash dist" consists of several lines. 
 Each line has these five tab-separated fields: 
