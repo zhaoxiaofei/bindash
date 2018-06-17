@@ -12,9 +12,9 @@ It can handle sequences consisting of terabytes of input data (gzipped or not, i
 # How to install:
 ```sh
 cd ${PROJECT_ROOT_DIRECTORY}  
-mkdir release && cd release  
+mkdir release && cd release
 cmake -DCMAKE_BUILD_TYPE=Release ..  
-make  
+make # For Windows with MSYS Makefiles, the command might be "cd ../ && make" because out-of-source build may or may not be supported on this platform. 
 ./binhash --help # to see a general help message   
 ```
 # How to run:
