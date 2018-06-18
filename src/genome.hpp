@@ -85,6 +85,7 @@ void print_entity(const Entity &entity) {
 	for (auto u : entity.usigs) {
 		std::cerr << "\t" << u;
 	}
+	
 	std::cerr << "\t" << entity.matchprob << "\n";
 }
 
@@ -96,7 +97,11 @@ void Entity::write(std::ofstream &binfile, std::ofstream &txtfile) {
 		// std::cerr << "\t" << std::hex << usig; if (i % 4 == 0) {std::cerr << std::endl;}; i++;
 		binfile.write((char*)&usig, sizeof(uint64_t));
 	}
-	txtfile << name << "\t" << std::scientific << matchprob << "\t";
+	double matchprob2 = matchprob;
+	if (matchprob2 < DBL_EPSILON) { matchprob2 = DBL_EPSILON; }
+	if (matchprob2 > 1.0 - DBL_EPSILON) { matchprob2 = 1.0 - DBL_EPSILON; }
+
+	txtfile << name << "\t" << std::scientific << matchprob2 << "\t";
 	txtfile << usigs.size() << "\n";
 }
 

@@ -212,7 +212,6 @@ int cmddist_filter(double &mutdist, double &pvalue,
 		pvalue = 1.0;
 	}
 	if (pvalue > args2.pthres) { return 2; }
-	// fprintf(stderr, "bhmath_pbinom_tail(%u, %u, %.4e) == %.4e\n", intersize, args1.sketchsize64 * NBITS(uint64_t), p, pvalue);
 
 	return 0;
 }
@@ -509,7 +508,7 @@ int main(int argc, char **argv) {
 			cmddist<false, false>(entities1, entities2, args1, args);
 		}
 #else
-		cmddist(tCLUSTER, tNNEIGHBORS, entities1, entities1, args1, args);
+		cmddist(tCLUSTER, tNNEIGHBORS, entities1, (tCLUSTER ? entities1 : entities2), args1, args);
 #endif
 	} else {
 		std::cerr << "Unrecognized command: " << argv[1] <<  "\n";
