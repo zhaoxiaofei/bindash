@@ -1,5 +1,5 @@
 
-BinDash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. 
+BinDash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. BinDash is based on binwise densified minhash.
 It is extremely fast and memory efficient.
 It can handle sequences consisting of terabytes of input data (gzipped or not, in fasta or fastq format). 
 
