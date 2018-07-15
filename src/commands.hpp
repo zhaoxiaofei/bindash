@@ -48,6 +48,8 @@ void allusage(const int argc, const char *const *argv) {
 	std::cerr << "Notes:\n\n";
 	std::cerr << "  To see command-specific usage, please enter\n"
 	          << "    " << argv[0] << " command --help\n\n";
+	std::cerr << "  To see version information, please enter\n"
+	          << "    " << argv[0] << " --version\n\n";
 	std::cerr << "  The format for options is --NAME=VALUE\n\n";	
 	exit(-2);
 }

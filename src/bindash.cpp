@@ -46,6 +46,8 @@
 #include <string.h>
 #include <time.h>
 
+#define VERSION "0.2.1"
+
 /* TODO:
  * Potential improvement to be made: CACHE_AWARE nearest neighbor search (may involve substantial additional coding).
  */
@@ -423,10 +425,22 @@ void cmddist(bool tCLUSTER, bool tNNEIGHBORS,
 int main(int argc, char **argv) {
 	time_t begtime, endtime;
 	time(&begtime);
-	std::cerr << argv[0] << " revision " << (STR(GIT_COMMIT_HASH)) << " " << (STR((GIT_DIFF_SHORTSTAT))) << std::endl;
+	
+	std::string commitsuffix = "";
+	if (std::string("") == (STR((GIT_DIFF_SHORTSTAT)))) {
+		commitsuffix = "-clean";
+	} else {
+		commitsuffix = std::string("-dirty ") + (STR((GIT_DIFF_SHORTSTAT)));
+	}
 	
 	if (argc < 2 || !strcmp("--help", argv[1])) { allusage(argc, argv); }
-	
+	if (!strcmp("--version", argv[1])) {
+		std::cerr << "version " << VERSION << " commit " << (STR(GIT_COMMIT_HASH)) << commitsuffix << std::endl;
+		exit(-1);
+	}
+	std::cerr << "Running " << argv[0] << " commit " << (STR(GIT_COMMIT_HASH)) << commitsuffix << std::endl;
+
+
 	if (!strcmp("exact", argv[1])) {
 		Sketchargs args;
 		args.parse(argc, argv);

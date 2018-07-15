@@ -17,7 +17,7 @@ execute_process(
 
 # Get the "not version-controlled" changes with respect to the working branch
 execute_process(
-  COMMAND git diff --shortstat
+  COMMAND git diff HEAD --shortstat
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   OUTPUT_VARIABLE GIT_DIFF_SHORTSTAT
   OUTPUT_STRIP_TRAILING_WHITESPACE
