@@ -427,7 +427,7 @@ int main(int argc, char **argv) {
 	time(&begtime);
 	
 	std::string commitsuffix = "";
-	if (std::string("") == (STR((GIT_DIFF_SHORTSTAT)))) {
+	if (std::string("()") == (STR((GIT_DIFF_SHORTSTAT)))) {
 		commitsuffix = "-clean";
 	} else {
 		commitsuffix = std::string("-dirty ") + (STR((GIT_DIFF_SHORTSTAT)));
