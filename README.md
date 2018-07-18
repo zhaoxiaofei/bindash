@@ -17,6 +17,19 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 make # For Windows with MSYS Makefiles, the command might be "cd ../ && make" because out-of-source build may or may not be supported on this platform. 
 ./bindash --help # to see a general help message   
 ```
+
+For MacOS, the native clang compiler cannot compile without compiling error. It is recommended to install gcc first as follows.
+
+```
+# install homebrew if not already done
+brew update
+brew install gcc@8
+GCCPATH=$(ls /usr/local/Cellar/gcc/*/bin/)
+export PATH="${GCCPATH}:${PATH}"
+# Set CC CXX to /usr/local/Cellar/gcc/*/bin/* as necessary
+# Then run cmake as above (a GUI for cmake may also be available for MacOS)
+```
+
 # How to run:
 
 The folowing three commands show how to run BinDash:
