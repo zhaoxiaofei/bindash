@@ -96,7 +96,6 @@ void entity_init(Entity &entity, CBuf &cbuf, const std::string &entityname, cons
 		genome_size = signset.size();
 		entity.usigs = std::vector<uint64_t>(signset.begin(), signset.end());
 	} else if (0 == args.minhashtype) { // multi minvals one hash function
-        std::fprintf(stderr, "sketchsize64: %zu\n", size_t(args.sketchsize64));
 		std::priority_queue<uint64_t> signqueue;
 		std::set<uint64_t> signset;
 		CyclicHash<uint64_t> hf(args.kmerlen, s1, s2, 64);
