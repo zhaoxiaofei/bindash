@@ -1,5 +1,5 @@
 
-BinDash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. 
+BinDash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. BinDash is based on binwise densified minhash.
 It is extremely fast and memory efficient.
 It can handle sequences consisting of terabytes of input data (gzipped or not, in fasta or fastq format). 
 
@@ -17,6 +17,19 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 make # For Windows with MSYS Makefiles, the command might be "cd ../ && make" because out-of-source build may or may not be supported on this platform. 
 ./bindash --help # to see a general help message   
 ```
+
+For MacOS, the native clang compiler cannot compile without compiling error. It is recommended to install gcc first as follows.
+
+```
+# install homebrew if not already done
+brew update
+brew install gcc@8
+GCCPATH=$(ls /usr/local/Cellar/gcc/*/bin/)
+export PATH="${GCCPATH}:${PATH}"
+# Set CC CXX to /usr/local/Cellar/gcc/*/bin/* as necessary
+# Then run cmake as above (a GUI for cmake may also be available for MacOS)
+```
+
 # How to run:
 
 The folowing three commands show how to run BinDash:
@@ -61,5 +74,12 @@ License: Apache 2.0
 
 # Reference
 
+Owen Kaser and Daniel Lemire, Strongly universal string hashing is fast, Computer Journal (2014) 57 (11): 1624-1638. http://arxiv.org/abs/1202.4961
+
+Daniel Lemire, Owen Kaser: Recursive n-gram hashing is pairwise independent, at best, Computer Speech & Language, Volume 24, Issue 4, October 2010, Pages 698-710 http://arxiv.org/abs/0705.4676
+
+Daniel Lemire, The universality of iterated hashing over variable-length strings, Discrete Applied Mathematics 160 (4-5), 2012. http://arxiv.org/abs/1008.1715
+
 Anshumali Shrivastava ; Proceedings of the 34th International Conference on Machine Learning, PMLR 70:3154-3163, 2017.
 
+XiaoFei Zhao; BinDash, software for fast genome distance estimation on a typical personal laptop, Bioinformatics, , bty651, https://doi.org/10.1093/bioinformatics/bty651
