@@ -270,15 +270,26 @@ const uint64_t estimate_genome_size2(const std::vector<uint64_t> &signs, size_t 
 	uint64_t binsize = (SIGN_MOD + nbins - 1ULL) / nbins;
 	std::vector<uint64_t> deltas;
 	deltas.reserve(signs.size());
+	uint64_t n_empty_bins = 0;
 	for (uint64_t binmin = 0, i = 0; 
 		binmin < SIGN_MOD && i < signs.size(); 
 		binmin += binsize, i++) {
-		assert(signs[i] >= binmin);
-		deltas.push_back(signs[i] - binmin);
+		// this is to prevent the issue https://github.com/zhaoxiaofei/bindash/issues/3 from happening
+		if (signs[i] >= binmin && signs[i] < binmin + binsize) {
+			deltas.push_back(signs[i] - binmin);
+		} else {
+			// this should rarely happens
+			n_empty_bins += 1;
+		}
+	}
+	// this is to address https://github.com/zhaoxiaofei/bindash/issues/3
+	// uses linear extrapolation to compute the difference between the two consecutive hash values that span the otherwise empty bin.
+	for (uint64_t i = 0; i < n_empty_bins; i++) {
+		deltas.push_back(binsize * (1 + i) / (1 + signs.size() - n_empty_bins) + binsize);
 	}
 	assert (deltas.size() == signs.size() /*|| !fprintf(stderr, "%u != %u", deltas.size(), signs.size())*/ );
 	std::sort(deltas.begin(), deltas.end());
-	return SIGN_MOD / MEDIAN2X(deltas, deltas.size());
+	return SIGN_MOD / MAX(1, MEDIAN2X(deltas, deltas.size()));
 }
 
 #endif
