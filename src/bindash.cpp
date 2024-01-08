@@ -34,9 +34,9 @@
 #include <set>
 #include <sstream>
 #include <tuple>
-#include <array>
 #include <vector>
-
+#include <array>
+#include <queue>
 #include <assert.h>
 #include <float.h>
 #include <limits.h>
@@ -359,7 +359,7 @@ void cmddist(bool tCLUSTER, bool tNNEIGHBORS,
 		}
 
 	} else {
-		using hit_t = std::tuple<double, double, long unsigned int, long unsigned int, long unsigned int, long unsigned int>;
+		typedef std::tuple<double, double, size_t, size_t, size_t, size_t> hit_t;
 		std::array<std::priority_queue<hit_t>, ISIZE> tophits_arr;
 		for (size_t i2 = 0; i2 < entities1.size(); i2 += ISIZE) {
 			size_t i2max = MIN(i2 + ISIZE, entities1.size());
