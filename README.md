@@ -27,7 +27,10 @@ brew install gcc@8
 GCCPATH=$(ls /usr/local/Cellar/gcc/*/bin/)
 export PATH="${GCCPATH}:${PATH}"
 # Set CC CXX to /usr/local/Cellar/gcc/*/bin/* as necessary
-# Then run cmake as above (a GUI for cmake may also be available for MacOS)
+# Then run cmake as above (a GUI for cmake may also be available for MacOS), for example on newest MacOS (M1 or later)
+CXX=/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13 CC=/opt/homebrew/Cellar/gcc/13.2.0/bin/gcc-13 cmake  -DCMAKE_BUILD_TYPE=Release ../
+CXX=/opt/homebrew/Cellar/gcc/13.2.0/bin/g++-13 CC=/opt/homebrew/Cellar/gcc/13.2.0/bin/gcc-13 make -j 8
+
 ```
 
 # How to run:
