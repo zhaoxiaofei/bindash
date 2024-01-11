@@ -25,6 +25,9 @@
 #include <queue>
 #include <set>
 #include <vector>
+#include <unordered_set>
+#include "murmur3.h"
+
 
 #define MEDIAN2X(data, n) ((data[(n-1)/2] + data[n/2]))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -66,7 +69,7 @@ uint64_t univhash2(uint64_t s, uint64_t t) {
   year={2017}
 }
 */
-int densifybin(std::vector<uint64_t> &signs) {
+int opt_densify(std::vector<uint64_t> &signs) {
 	uint64_t minval = UINT64_MAX;
 	uint64_t maxval = 0;
 	for (auto sign : signs) { 
@@ -85,6 +88,49 @@ int densifybin(std::vector<uint64_t> &signs) {
 		signs[i] = signs[j];
 	}
 	return 1;
+}
+
+// Utility function to hash an integer using MurmurHash3, for mapping non-empty bins to empty ones
+uint32_t murmur_hash(uint32_t value, uint32_t seed) {
+    uint32_t hash_some[1];
+    MurmurHash3_x86_32(&value, sizeof(value), seed, hash_some);
+    return hash_some[0];
+}
+
+/* This densitfication strategy is found at
+@article{Mai2020Densification,
+  title={On Densification for Minwise Hashing},
+  author={Mai, Tung},
+  journal={Uncertainty in Artificial Intelligence, http://proceedings.mlr.press/v115/mai20a.html},
+  year={2020}
+}
+*/
+int revopt_densify(std::vector<uint64_t>& v) {
+    size_t size = v.size();
+    std::unordered_set<size_t> E; // Set of empty bins
+
+    // Initial identification of empty bins, we use UINT64_MAX as unassigned bins
+    for (size_t i = 0; i < size; ++i) {
+        if (v[i] == UINT64_MAX) {
+            E.insert(i);
+        }
+    }
+    // Main densification loop
+    size_t alpha = 0;
+    while (!E.empty()) {
+        for (size_t j = 0; j < size; ++j) {
+            if (v[j] != UINT64_MAX) {
+                size_t i = murmur_hash(j, alpha) % size;
+                if (E.find(i) != E.end()) {
+                    v[i] = v[j]; // Directly update the bin in the input vector
+                    E.erase(i);
+                    if (E.empty()) break;
+                }
+            }
+        }
+        alpha++;
+    }
+    return 1; // Return a status code indicating success
 }
 
 void ppush(std::priority_queue<uint64_t> &signqueue, std::set<uint64_t> &signset, uint64_t sign, const size_t sketchsize64) {
