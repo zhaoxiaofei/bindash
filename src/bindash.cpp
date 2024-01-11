@@ -156,7 +156,7 @@ void entity_init(Entity &entity, CBuf &cbuf, const std::string &entityname, cons
 			if (cbuf.ceof()) { break; }
 			hashupdate2(cbuf, signs, hf, hfrc, args.isstrandpreserved, binsize);
 		}
-		uint64_t res = UINT64_MAX;
+		int res = 0;
 		if (1 == args.dens){
 			// use optimal densification
 			res = opt_densify(signs);
@@ -164,7 +164,7 @@ void entity_init(Entity &entity, CBuf &cbuf, const std::string &entityname, cons
 			// use reverse optimal densification, or faster densification
 			res = revopt_densify(signs);
 		}
-		if (res != UINT64_MAX) {
+		if (res != 0) {
 			std::cerr << "Warning: the genome " << entityname << " is densified with flag " << res <<  std::endl;
 		}
 		genome_size = estimate_genome_size2(signs, args.sketchsize64);
