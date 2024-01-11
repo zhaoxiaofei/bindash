@@ -105,13 +105,23 @@ uint32_t murmur_hash(uint32_t value, uint32_t seed) {
   year={2020}
 }
 */
-int revopt_densify(std::vector<uint64_t>& v) {
-    size_t size = v.size();
+int revopt_densify(std::vector<uint64_t>& signs) {
+
+	uint64_t minval = UINT64_MAX;
+	uint64_t maxval = 0;
+	for (auto sign : signs) { 
+		minval = MIN(minval, sign);
+		maxval = MAX(maxval, sign);
+	}
+	if (UINT64_MAX != maxval) { return 0; }
+	if (UINT64_MAX == minval) { return -1; }
+
+    size_t size = signs.size();
     std::unordered_set<size_t> E; // Set of empty bins
 
     // Initial identification of empty bins, we use UINT64_MAX as unassigned bins
     for (size_t i = 0; i < size; ++i) {
-        if (v[i] == UINT64_MAX) {
+        if (signs[i] == UINT64_MAX) {
             E.insert(i);
         }
     }
@@ -119,10 +129,10 @@ int revopt_densify(std::vector<uint64_t>& v) {
     size_t alpha = 0;
     while (!E.empty()) {
         for (size_t j = 0; j < size; ++j) {
-            if (v[j] != UINT64_MAX) {
+            if (signs[j] != UINT64_MAX) {
                 size_t i = murmur_hash(j, alpha) % size;
                 if (E.find(i) != E.end()) {
-                    v[i] = v[j]; // Directly update the bin in the input vector
+                    signs[i] = signs[j]; // Directly update the bin in the input vector
                     E.erase(i);
                     if (E.empty()) break;
                 }
