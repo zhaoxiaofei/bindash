@@ -8,7 +8,7 @@ It can handle sequences consisting of terabytes of input data (gzipped or not, i
  - any C++ compiler supporting the C++11 standard
  - CMake version 2.6 or plus
  - zlib 
- 
+
 # How to install:
 ```sh
 cd ${PROJECT_ROOT_DIRECTORY}  
@@ -28,6 +28,7 @@ GCCPATH=$(ls /usr/local/Cellar/gcc/*/bin/)
 export PATH="${GCCPATH}:${PATH}"
 # Set CC CXX to /usr/local/Cellar/gcc/*/bin/* as necessary
 # Then run cmake as above (a GUI for cmake may also be available for MacOS)
+
 ```
 
 # How to run:
@@ -55,7 +56,7 @@ Basically, compression of a genome is done as follows.
  1. All k-mers of each genome are selected and then transformed into hash values.
  2. The range of all possible hash values are partitioned into some bins.
  3. The smallest hash value in each bin is selected.
- 4. If a bin is empty (i.e., has no hash values), then the smallest hash value from the next bin is picked. The definition of the next bin is proposed by Shrivastava.
+ 4. If a bin is empty (i.e., has no hash values), then the smallest hash value from the next bin is picked. The definition of the next bin is proposed by Shrivastava 2017. Another densification strategy is to map reversely from non-empty bins to empty bins and choose the smallest hash value from non-empty bin to fill the empty bin, as proposed by Mai et.al. 2020. This new densification strategy has a worse case O(k*log(k)) complexity  while Shrivastava 2017 has a O(k^2) worse case complexity.
  5. The lowest (i.e., least significant) b-bits of each hash value are picked to form the signature of the genome.
 
 Two genomes are compared by simply performing b XOR opeations for b bit positions, followed by (b-1) AND operations for these b bit positions. 

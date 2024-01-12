@@ -63,6 +63,7 @@ public:
 	std::string listfname = "-";
 	size_t kmerlen = 21;
 	int minhashtype = 2;
+	int dens = 1;
 	size_t nthreads = 1;
 	std::string outfname = "";
 	uint64_t randseed = 41; //0x3355557799AACCULL;
@@ -93,6 +94,7 @@ void verifycompatible(const Sketchargs &args1, const Sketchargs &args2, std::str
 	isok &= areequals_printerrifnot(args1.isstrandpreserved, args2.isstrandpreserved, "--isstrandpreserved", infname1, infname2);
 	isok &= areequals_printerrifnot(args1.kmerlen, args2.kmerlen, "--kmerlen", infname1, infname2);
 	isok &= areequals_printerrifnot(args1.minhashtype, args2.minhashtype, "--minhashtype", infname1, infname2);
+	isok &= areequals_printerrifnot(args1.dens, args2.dens, "--dens", infname1, infname2);
 	isok &= areequals_printerrifnot(args1.randseed, args2.randseed, "--randseed", infname1, infname2);
 	isok &= areequals_printerrifnot(args1.sketchsize64, args2.sketchsize64, "--sketchsize64", infname1, infname2);
 	if (!isok) { exit(2); }
@@ -111,6 +113,9 @@ int Sketchargs::usage(const int argc, const char *const *argv) {
 	          << "    \"Path-to-a-sequence-file(F) <TAB> [genome-name(G) <TAB> number-of-consecutive-sequences(N) ...]\".\n"
 	          << "    If only F is provided, then use F as G and let N be the number of sequences in N [" << listfname << "]\n\n";
 	std::cerr << "  --nthreads : This many threads will be spawned for processing. [" << nthreads << "]\n\n";
+	std::cerr << "  --dens : This will use a specific densification strategy.\n" 
+				 "		1 means optimal densification, default. \n"
+				 "		2 means reverse optimal densification. [" << dens << "]\n\n";
 	std::cerr << "  --minhashtype : Type of minhash.\n" 
 	          << "    -1 means perfect hash function for nucleotides where 5^(kmerlen) < 2^63.\n" 
 	          << "    0 means one hash-function with multiple min-values.\n"
@@ -148,6 +153,7 @@ int Sketchargs::write(const std::string &systime_began, const std::string &systi
 	file << std::boolalpha << "--isstrandpreserved=" << isstrandpreserved << "\n";
 	file << "--kmerlen=" << kmerlen << "\n";
 	file << "--listfname=" << listfname << "\n";
+	file << "--dens=" << dens << "\n";
 	file << "--minhashtype=" << minhashtype << "\n";
 	file << "--nthreads=" << nthreads << "\n";
 	file << "--outfname=" << outfname << "\n";
@@ -225,6 +231,7 @@ int Sketchargs::_parse(std::string arg) {
 	else if ("--isstrandpreserved" == key) { issval >> std::boolalpha >> isstrandpreserved; }
 	else if ("--kmerlen" ==  key) { issval >> kmerlen; }
 	else if ("--listfname" ==  key) { issval >> listfname; }
+	else if ("--dens" ==  key) { issval >> dens; }
 	else if ("--minhashtype" ==  key) { issval >> minhashtype; }
 	else if ("--nthreads" == key) { issval >> nthreads; }
 	else if ("--outfname" == key) { issval >> outfname; }

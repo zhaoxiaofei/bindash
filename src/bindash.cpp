@@ -35,7 +35,8 @@
 #include <sstream>
 #include <tuple>
 #include <vector>
-
+#include <array>
+#include <queue>
 #include <assert.h>
 #include <float.h>
 #include <limits.h>
@@ -47,7 +48,7 @@
 #include <string.h>
 #include <time.h>
 
-#define VERSION "0.2.1"
+#define VERSION "0.3.0"
 
 /* TODO:
  * Potential improvement to be made: CACHE_AWARE nearest neighbor search (may involve substantial additional coding).
@@ -155,7 +156,15 @@ void entity_init(Entity &entity, CBuf &cbuf, const std::string &entityname, cons
 			if (cbuf.ceof()) { break; }
 			hashupdate2(cbuf, signs, hf, hfrc, args.isstrandpreserved, binsize);
 		}
-		int res = densifybin(signs);
+		// Declaration of res as an integer
+		int res;
+		if (1 == args.dens){
+			// use optimal densification
+			res = opt_densify(signs);
+		} else if (2 == args.dens){
+			// use reverse optimal densification, or faster densification
+			res = revopt_densify(signs);
+		}
 		if (res != 0) {
 			std::cerr << "Warning: the genome " << entityname << " is densified with flag " << res <<  std::endl;
 		}
