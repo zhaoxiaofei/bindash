@@ -2,9 +2,13 @@
 BinDash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. BinDash is based on <u>Bin</u>wise <u>D</u>ensified minh<u>ash</u> for estimation of Jaccard index between genomes. It is extremely fast and memory efficient. It can handle sequences consisting of terabytes of input data (gzipped or not, in fasta or fastq format). 
 
 The basic idea is: the Jaccard index as an accurate proxy of Average Nucleotide Identity(ANI) or mutation rate (1-ANI) according to equation:
+
 $$ANI=1+\frac{1}{k}log\frac{2*J}{1+J}$$
+
 if assuming a Poisson model, and 
+
 $$ANI=(\frac{2*J}{1+J})^{\frac{1}{k}}$$
+
 if assuming a Binomial model. You can specify which model to use via --model option, see below.
 
 # Dependencies:
@@ -42,7 +46,6 @@ export PATH="${GCCPATH}:${PATH}"
 conda install bindash -c bioconda
 
 ```
-## Or if you have Homebrew installed on MacOS
 
 
 # How to run:
