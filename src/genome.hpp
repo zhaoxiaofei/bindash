@@ -253,7 +253,7 @@ const double intersize_to_jaccard(const unsigned int intersize, size_t sketchsiz
 const double intersize_to_dice(const unsigned int intersize, size_t sketchsize64, double smoothfactor = (DBL_MIN*(1ULL<<30ULL))) {
 	return (double)(2 * intersize + smoothfactor) / (double)(NBITS(uint64_t) * sketchsize64 + intersize + smoothfactor);
 }
-// use Poisson for the underlying evolutionary model
+// use Poisson as the underlying evolutionary model, see Ondov et.al., 2015 Genom. Biol and Jain et.al.,2017 JCB; 
 void intersize_to_mutdist_init_poisson(std::vector<double> &intersize_to_mutdist, size_t sketchsize64, size_t kmerlen) {
 	intersize_to_mutdist = std::vector<double>(NBITS(uint64_t) * sketchsize64 + 1);
 	for (unsigned int i = 0; i < NBITS(uint64_t) * sketchsize64 + 1; i++) {
@@ -263,7 +263,7 @@ void intersize_to_mutdist_init_poisson(std::vector<double> &intersize_to_mutdist
 	}
 	intersize_to_mutdist[NBITS(uint64_t) * sketchsize64] = 0;
 }
-// use Binomial for the underlying evolutionary model
+// use Binomial as the underlying evolutionary model, see Belbasi et.al.,2023 Bioinformatics and Blanca et.al., 2022, JCB;
 void intersize_to_mutdist_init_binomial(std::vector<double> &intersize_to_mutdist, size_t sketchsize64, size_t kmerlen) {
 	intersize_to_mutdist = std::vector<double>(NBITS(uint64_t) * sketchsize64 + 1);
 	for (unsigned int i = 0; i < NBITS(uint64_t) * sketchsize64 + 1; i++) {
