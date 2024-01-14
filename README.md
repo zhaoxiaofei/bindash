@@ -1,5 +1,5 @@
 
-BinDash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. BinDash is based on <u>Bin</u>wise <u>D</u>ensified minh<u>ash</u> for estimation of Jaccard index between genomes. It is extremely fast and memory efficient. It can handle sequences consisting of terabytes of input data (gzipped or not, in fasta or fastq format). 
+BinDash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. BinDash is based on **Bin**wise **D**ensified minh**ash** for estimation of mutation rate between genomes. We implemented ***b-bit one-permutation rolling MinHash with optimal/faster densification***.  It is extremely fast and memory efficient. It can handle sequences consisting of terabytes of input data (gzipped or not, in fasta or fastq format). 
 
 The basic idea is: the Jaccard index as an accurate proxy of Average Nucleotide Identity(ANI) or mutation rate (1-ANI) according to equation:
 
@@ -30,7 +30,7 @@ For MacOS, the native clang compiler cannot compile without compiling error. It 
 ```
 # install homebrew if not already done
 brew update
-brew install gcc@8
+brew install gcc@13
 GCCPATH=$(ls /usr/local/Cellar/gcc/*/bin/)
 export PATH="${GCCPATH}:${PATH}"
 # Set CC CXX to /usr/local/Cellar/gcc/*/bin/* as necessary
@@ -101,6 +101,6 @@ Daniel Lemire, The universality of iterated hashing over variable-length strings
 
 Anshumali Shrivastava, Optimal Densification for Fast and Accurate Minwise Hashing, Proceedings of the 34th International Conference on Machine Learning, PMLR 70:3154-3163, 2017. http://proceedings.mlr.press/v70/shrivastava17a.html 
 
-XiaoFei Zhao; BinDash, software for fast genome distance estimation on a typical personal laptop, Bioinformatics, , bty651, https://doi.org/10.1093/bioinformatics/bty651
-
 Tung Mai et.al., On Densification for Minwise Hashing, Uncertainty in Artificial Intelligence. 2020., http://proceedings.mlr.press/v115/mai20a.html 
+
+XiaoFei Zhao; BinDash, software for fast genome distance estimation on a typical personal laptop, Bioinformatics, , bty651, https://doi.org/10.1093/bioinformatics/bty651
