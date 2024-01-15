@@ -316,8 +316,12 @@ void cmddist(bool tCLUSTER, bool tNNEIGHBORS,
 	}
 
 	std::vector<double> intersize_to_mutdist;
-	intersize_to_mutdist_init(intersize_to_mutdist, args1.sketchsize64, args1.kmerlen);
+	if (1 == args2.model){
+		intersize_to_mutdist_init_poisson(intersize_to_mutdist, args1.sketchsize64, args1.kmerlen);
+	} else if (2 == args2.model) {
+		intersize_to_mutdist_init_binomial(intersize_to_mutdist, args1.sketchsize64, args1.kmerlen);
 
+	}
 	std::cerr << "Max number of genome comparions per cached data: " << ISIZE << "x" << CACHE_SIZE << std::endl;
 
 	size_t buffer_sizes[ISIZE];

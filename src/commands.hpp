@@ -57,7 +57,7 @@ void allusage(const int argc, const char *const *argv) {
 class Sketchargs {
 public:
 	std::vector<std::string> infnames;
-	size_t bbits = 14; // 2; // = log2(64 * sketchsize64) TODO: find theoretical justification
+	size_t bbits = 16; // 2; // = log2(64 * sketchsize64) TODO: find theoretical justification
 	bool iscasepreserved = false;
 	bool isstrandpreserved = false;
 	std::string listfname = "-";
@@ -120,7 +120,7 @@ int Sketchargs::usage(const int argc, const char *const *argv) {
 	          << "    -1 means perfect hash function for nucleotides where 5^(kmerlen) < 2^63.\n" 
 	          << "    0 means one hash-function with multiple min-values.\n"
 	          << "    1 means multiple hash-functions and one min-value per function.\n"
-	          << "    2 means one hash-function with partitionned buckets. [" << minhashtype << "]\n\n";
+	          << "    2 means one hash-function with partitioned buckets. [" << minhashtype << "]\n\n";
 	std::cerr << "  --bbits : Number of bits kept as in b-bits minhash. [" << bbits << "]\n\n";
 	std::cerr << "  --kmerlen : K-mer length used to generate minhash values. [" << kmerlen << "]\n\n";
 	std::cerr << "  --sketchsize64 : Sketch size divided by 64, or equivalently,\n" 
@@ -308,6 +308,7 @@ public:
 	double mthres = 2.5;
 	size_t nneighbors = 0;
 	size_t nthreads = 1;
+	int model = 1;
 	std::string outfname = "-";
 	double pthres = 1 + 1e-4;
 	int usage(const int argc, const char *const *argv);
@@ -330,6 +331,9 @@ int Distargs::usage(const int argc, const char *const *argv) {
 	std::cerr << "  --nneighbors : Only this number of best-hit results per query are reported.\n" 
 	          << "    If this value is zero then report all. [" << nneighbors << "].\n\n";
 	std::cerr << "  --nthreads : This many threads will be spawned for processing. [" << nthreads << "]\n\n";
+	std::cerr << "  --model : This will use a specific evolutionary model.\n" 
+				 "		1 means Poisson model, default. \n"
+				 "		2 means Binomial model. [" << model << "]\n\n";
 	std::cerr << "  --outfname : The output file comparing the query and target sketches.\n"
 	          << "    The ouput file contains the following tab-separated fields per result line:\n"
 	          << "    query-sketch, target-sketch, mutation-distance, p-value, and jaccard-index. [" << outfname << "].\n\n";
@@ -355,6 +359,7 @@ int Distargs::_parse(std::string arg) {
 	if (arg.find("--help", 0) == 0) { return 1; }
 	else if ("--ithres" == key) { issval >> ithres; }
 	else if ("--mthres" == key) { issval >> mthres; }
+	else if ("--model" == key) { issval >> model; }
 	else if ("--nneighbors" == key) { issval >> nneighbors; }
 	else if ("--nthreads" ==  key) { issval >> nthreads; }
 	else if ("--outfname" == key) { issval >> outfname; }
