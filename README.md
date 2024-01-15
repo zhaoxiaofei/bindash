@@ -31,11 +31,13 @@ For MacOS, the native clang compiler cannot compile without compiling error. It 
 # install homebrew if not already done
 brew update
 brew install gcc@13
-GCCPATH=$(ls /usr/local/Cellar/gcc/*/bin/)
-export PATH="${GCCPATH}:${PATH}"
-# Set CC CXX to /usr/local/Cellar/gcc/*/bin/* as necessary
-# Then run cmake as above (a GUI for cmake may also be available for MacOS)
 
+cd ${PROJECT_ROOT_DIRECTORY}  
+mkdir release && cd release
+
+# Then run cmake as above (a GUI for cmake may also be available for MacOS)
+CC="$(brew --prefix)/bin/gcc-13" CXX="$(brew --prefix)/bin/g++-13" cmake -DCMAKE_INSTALL_PREFIX=. ..
+make
 ```
 
 ## Or if you have conda installed on linux
