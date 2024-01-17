@@ -1,5 +1,5 @@
 /*
- * Copyright [2018] [XiaoFei Zhao]
+ * Copyright [2018] [XiaoFei Zhao] and [Jianshu Zhao]
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,9 @@
 #define STR(tok) STR_EXPAND(tok)
 
 void allusage(const int argc, const char *const *argv) {
+	std::cerr << "B-bit One-Permutation Rolling MinHash with Optimal/Faster\n"
+			  << "Densification for Genome Search and Comparisons.\n" 
+			  << "Or Binwise Densified MinHash.\n\n"; 
 	std::cerr << "Usage:\n  " << argv[0] << " <commmand> [options] [arguments ...]\n\n";
 	std::cerr << "Commands:\n\n";
 	std::cerr << "  sketch: reduce mutiple genomes into one sketch.\n" 
@@ -57,7 +60,7 @@ void allusage(const int argc, const char *const *argv) {
 class Sketchargs {
 public:
 	std::vector<std::string> infnames;
-	size_t bbits = 16; // 2; // = log2(64 * sketchsize64) TODO: find theoretical justification
+	size_t bbits = 16; // 2; // = log2(64 * sketchsize64) TODO: find theoretical justification, also consider SIMD implementation
 	bool iscasepreserved = false;
 	bool isstrandpreserved = false;
 	std::string listfname = "-";
@@ -113,7 +116,7 @@ int Sketchargs::usage(const int argc, const char *const *argv) {
 	          << "    \"Path-to-a-sequence-file(F) <TAB> [genome-name(G) <TAB> number-of-consecutive-sequences(N) ...]\".\n"
 	          << "    If only F is provided, then use F as G and let N be the number of sequences in N [" << listfname << "]\n\n";
 	std::cerr << "  --nthreads : This many threads will be spawned for processing. [" << nthreads << "]\n\n";
-	std::cerr << "  --dens : This will use a specific densification strategy.\n" 
+	std::cerr << "  --dens : This will use a specific densification strategy for minhashtype 2.\n" 
 				 "		1 means optimal densification, default. \n"
 				 "		2 means reverse optimal densification. [" << dens << "]\n\n";
 	std::cerr << "  --minhashtype : Type of minhash.\n" 
