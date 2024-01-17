@@ -35,6 +35,13 @@
 #define STR(tok) STR_EXPAND(tok)
 
 void allusage(const int argc, const char *const *argv) {
+	std::cerr << "  .______    __  .__   __.  _______       ___           _______. __    __ \n"
+	          << "  |   _  \\  |  | |  \\ |  | |       \\     /   \\         /       ||  |  |  |\n"
+	          << "  |  |_)  | |  | |   \\|  | |  .--.  |   /  ^  \\       |   (----`|  |__|  |\n"
+	          << "  |   _  <  |  | |  . `  | |  |  |  |  /  /_\\  \\       \\   \\    |   __   |\n"
+	          << "  |  |_)  | |  | |  |\\   | |  '--'  | /  _____  \\  .----)   |   |  |  |  |\n"
+	          << "  |______/  |__| |__| \\__| |_______/ /__/     \\__\\ |_______/    |__|  |__|\n"
+	          << " \n\n";  
 	std::cerr << "B-bit One-Permutation Rolling MinHash with Optimal/Faster\n"
 			  << "Densification for Genome Search and Comparisons.\n" 
 			  << "Or Binwise Densified MinHash.\n\n"; 
