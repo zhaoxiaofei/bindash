@@ -24,6 +24,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <thread>
 
 #include <assert.h>
 #include <stdint.h>
@@ -73,10 +74,10 @@ public:
 	bool iscasepreserved = false;
 	bool isstrandpreserved = false;
 	std::string listfname = "-";
-	size_t kmerlen = 21;
+	size_t kmerlen = 16;
 	int minhashtype = 2;
 	int dens = 1;
-	size_t nthreads = 1;
+	size_t nthreads = std::thread::hardware_concurrency();
 	std::string outfname = "";
 	uint64_t randseed = 41; //0x3355557799AACCULL;
 	size_t sketchsize64 = 32;
