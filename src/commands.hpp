@@ -321,7 +321,7 @@ public:
 	size_t ithres = 2;
 	double mthres = 2.5;
 	size_t nneighbors = 0;
-	size_t nthreads = 1;
+	size_t nthreads = std::thread::hardware_concurrency();
 	int model = 1;
 	std::string outfname = "-";
 	double pthres = 1 + 1e-4;
