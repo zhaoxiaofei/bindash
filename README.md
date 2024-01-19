@@ -1,7 +1,9 @@
+![Alt!](https://github.com/jianshu93/bindash/blob/master/BinDash_logo.jpg?raw=true)
+
 
 BinDash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. BinDash is based on **Bin**wise **D**ensified minh**ash** for estimation of mutation rate between genomes. We implemented ***b-bit one-permutation rolling MinHash with optimal/faster densification***.  It is extremely fast and memory efficient. It can handle sequences consisting of terabytes of input data (gzipped or not, in fasta or fastq format). 
 
-The basic idea is: the Jaccard index as an accurate proxy of Average Nucleotide Identity (ANI) or mutation rate (1-ANI) according to equation:
+The basic idea is: the Jaccard index as an accurate proxy of Average Nucleotide Identity(ANI) or mutation rate (1-ANI) according to equation:
 
 $$ANI=1+\frac{1}{k}log\frac{2*J}{1+J}$$
 

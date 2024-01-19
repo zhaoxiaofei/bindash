@@ -157,7 +157,7 @@ void entity_init(Entity &entity, CBuf &cbuf, const std::string &entityname, cons
 			hashupdate2(cbuf, signs, hf, hfrc, args.isstrandpreserved, binsize);
 		}
 		// Declaration of res as an integer
-		int res;
+		int res = 0;
 		if (1 == args.dens){
 			// use optimal densification
 			res = opt_densify(signs);
