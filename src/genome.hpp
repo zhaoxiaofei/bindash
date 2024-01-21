@@ -28,6 +28,7 @@
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "libpopcnt.h"
 
 #define BITATPOS(x, pos) ((x & (1ULL << pos)) >> pos)
 #define NBITS(x) (8*sizeof(x))
@@ -46,28 +47,6 @@
 #ifndef __has_builtin
 	#define __has_builtin(x) 0
 #endif
-
-/*
- * This uses fewer arithmetic operations than any other known
- * implementation on machines with fast multiplication.
- * It uses 12 arithmetic operations, one of which is a multiply.
- * http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation
- */
-static inline uint64_t popcount64(uint64_t x)
-{
-	uint64_t m1 = 0x5555555555555555ll;
-	uint64_t m2 = 0x3333333333333333ll;
-	uint64_t m4 = 0x0F0F0F0F0F0F0F0Fll;
-	uint64_t h01 = 0x0101010101010101ll;
-
-	x -= (x >> 1) & m1;
-	x = (x & m2) + ((x >> 2) & m2);
-	x = (x + (x >> 4)) & m4;
-
-	return (x * h01) >> 56;
-}
-
-// End of macros and method copied from https://github.com/kimwalisch/libpopcnt
 
 class Entity {
 public:
@@ -218,14 +197,15 @@ const size_t calc_intersize12(const Entity &e1, const Entity &e2, const size_t s
 			// std::cout << " bits = " << std::hex << bits << std::endl;
 		}
 
-		// The popcnt method from "libpopcnt-2.2/libpopcnt.h" gives compiling error on MacOS. 
-		// samebits += popcnt(&bits, sizeof(uint64_t)); // uses  __builtin_popcountll(bits) on most architectures;
+		// The popcnt method from "libpopcnt-2.5/libpopcnt.h" gives compiling error on MacOS. 
+		samebits += popcnt(&bits, sizeof(uint64_t)); // uses  __builtin_popcountll(bits) on most architectures;
 
-#if GNUC_PREREQ(4, 2) || __has_builtin(__builtin_popcountll) 
+/*#if GNUC_PREREQ(4, 2) || __has_builtin(__builtin_popcountll) 
 		samebits += __builtin_popcountll(bits);
 #else
 		samebits += popcount64(bits)
 #endif
+*/
 	}
 	// std::cout << " samebits = " << std::hex << samebits << std::endl;
 	const size_t maxnbits = sketchsize64 * NBITS(uint64_t); 
