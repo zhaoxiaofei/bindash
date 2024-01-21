@@ -197,8 +197,8 @@ const size_t calc_intersize12(const Entity &e1, const Entity &e2, const size_t s
 			// std::cout << " bits = " << std::hex << bits << std::endl;
 		}
 
-		// The popcnt method from "libpopcnt-2.5/libpopcnt.h" gives compiling error on MacOS. 
-		samebits += popcnt(&bits, sizeof(uint64_t)); // uses  __builtin_popcountll(bits) on most architectures;
+		// The popcnt method from "libpopcnt-2.5/libpopcnt.h". 
+		samebits += popcnt(&bits, sizeof(uint64_t));
 
 /*#if GNUC_PREREQ(4, 2) || __has_builtin(__builtin_popcountll) 
 		samebits += __builtin_popcountll(bits);
