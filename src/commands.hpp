@@ -1,5 +1,5 @@
 /*
- * Copyright [2018] [XiaoFei Zhao]
+ * Copyright [2023] [XiaoFei Zhao] and [Jianshu Zhao] 
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,12 +37,12 @@
 #define STR(tok) STR_EXPAND(tok)
 
 void allusage(const int argc, const char *const *argv) {
-	std::cerr << "  .______    __  .__   __.  _______       ___           _______. __    __ \n"
-	          << "  |   _  \\  |  | |  \\ |  | |       \\     /   \\         /       ||  |  |  |\n"
-	          << "  |  |_)  | |  | |   \\|  | |  .--.  |   /  ^  \\       |   (----`|  |__|  |\n"
-	          << "  |   _  <  |  | |  . `  | |  |  |  |  /  /_\\  \\       \\   \\    |   __   |\n"
-	          << "  |  |_)  | |  | |  |\\   | |  '--'  | /  _____  \\  .----)   |   |  |  |  |\n"
-	          << "  |______/  |__| |__| \\__| |_______/ /__/     \\__\\ |_______/    |__|  |__|\n"
+	std::cerr << R"=(  .______    __  .__   __.  _______       ___         ____.  __    __ )=" << "\n"
+	          << R"=(  |   _  \  |  | |  \ |  | |       \     /   \       /    | |  |  |  |)=" << "\n"
+	          << R"=(  |  |_)  | |  | |   \|  | |  .--.  |   /  ^  \     |  (--` |  |__|  |)=" << "\n"
+	          << R"=(  |   _  <  |  | |  . `  | |  |  |  |  /  /_\  \     \  \   |   __   |)=" << "\n"
+	          << R"=(  |  |_)  | |  | |  |\   | |  '--'  | /  _____  \  .--)  |  |  |  |  |)=" << "\n"
+	          << R"=(  |______/  |__| |__| \__| |_______/ /__/     \__\ |____/   |__|  |__|)=" << "\n"
 	          << " \n\n";
 	std::cerr << emojicpp::emojize(":alien::alien::alien:\n\n");
 	std::cerr << "B-bit One-Permutation Rolling MinHash with Optimal/Faster\n"

@@ -1,5 +1,5 @@
 /*
- * Copyright [2018] [XiaoFei Zhao]
+ * Copyright [2023] [XiaoFei Zhao] and [Jianshu Zhao]
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ void binsign(std::vector<uint64_t> &signs, const uint64_t sign, const uint64_t b
 	// std::cerr << "binning " << sign << std::endl;
 	uint64_t binidx = sign / binsize;
 	// assert(binidx < signs.size());
+//See Shrivastava and Li 2014, Densifying one permutation hashing via rota- tion for fast near neighbor search, 2014, ICML
 #ifdef CANONICAL_DENSIFICATION
 	while (sign < signs[binidx]) {
 		signs[binidx] = sign;
@@ -65,7 +66,7 @@ uint64_t univhash2(uint64_t s, uint64_t t) {
 @article{shrivastava2017optimal,
   title={Optimal densification for fast and accurate minwise hashing},
   author={Shrivastava, Anshumali},
-  journal={arXiv preprint arXiv:1703.04664},
+  journal={International Conference on Machine Learning, http://proceedings.mlr.press/v70/shrivastava17a.html},
   year={2017}
 }
 */

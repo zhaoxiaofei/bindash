@@ -80,7 +80,7 @@ Basically, compression of a genome is done as follows.
  4. If a bin is empty (i.e., has no hash values), then the smallest hash value from the next bin is picked. The definition of the next bin is proposed by Shrivastava 2017. Another densification strategy is to map reversely from non-empty bins to empty bins and choose the smallest hash value from non-empty bin to fill the empty bin, as proposed by Mai et.al. 2020. This new densification strategy has a worse case O(k*log(k)) complexity  while Shrivastava 2017 has a O(k^2) worse case complexity.
  5. The lowest (i.e., least significant) b-bits of each hash value are picked to form the signature of the genome.
  6. Two genomes are compared by simply performing b XOR opeations for b bit positions, followed by (b-1) AND operations for these b bit positions. 
-
+7. By default, BinDash automatically picks the fastest POPCOUNT algorithm for the given array or sketch size based on your machine instructions (e.g. AVX2 or AVX512).
 
 
 # Limitations:
@@ -102,6 +102,8 @@ Owen Kaser and Daniel Lemire, Strongly universal string hashing is fast, Compute
 Daniel Lemire, Owen Kaser: Recursive n-gram hashing is pairwise independent, at best, Computer Speech & Language, Volume 24, Issue 4, October 2010, Pages 698-710 http://arxiv.org/abs/0705.4676
 
 Daniel Lemire, The universality of iterated hashing over variable-length strings, Discrete Applied Mathematics 160 (4-5), 2012. http://arxiv.org/abs/1008.1715
+
+Muła, Wojciech, Nathan Kurz, and Daniel Lemire. "Faster population counts using AVX2 instructions." The Computer Journal 61, no. 1 (2018): 111-120. https://academic.oup.com/comjnl/article-abstract/61/1/111/3852071 
 
 Anshumali Shrivastava, Optimal Densification for Fast and Accurate Minwise Hashing, Proceedings of the 34th International Conference on Machine Learning, PMLR 70:3154-3163, 2017. http://proceedings.mlr.press/v70/shrivastava17a.html 
 
