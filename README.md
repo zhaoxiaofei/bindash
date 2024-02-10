@@ -83,6 +83,8 @@ Each line has these five tab-separated fields:
  - p-value for the mutation distance
  - Jaccard Index between Q and T
 
+According to our experiments and theoretical analysis, sketch size (the skethchsize64 option) shoule be larger than 188 (that is actual sketch size is larger than ~12,000) to be accurate for genome pairs with ANI above 99.5%
+
 # How BinDash works:
 
 By default, BinDash uses the optimally densified MinHash proposed by Shrivastava. This MinHash technique allows for efficient compression and fast comparison. 
