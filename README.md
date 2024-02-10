@@ -13,13 +13,32 @@ $$ANI=(\frac{2*J}{1+J})^{\frac{1}{k}}$$
 
 if assuming a Binomial model. You can specify which model to use via --model option, see below.
 
-# Dependencies:
 
- - any C++ compiler supporting the C++11 standard
- - CMake version 2.6 or plus
- - zlib 
+# How to install (simple):
+Precompiled binaries on modern Linux can be found [here](https://github.com/jianshu93/bindash/releases/tag/v2.1). On MacOS, GNU GCC has to be installed first, we recommend the homebrew install (see below).
 
-# How to install:
+```bash
+wget https://github.com/jianshu93/bindash/releases/download/v2.1/BinDash_Linux_x86-64_v2.0.tar.gz
+tar -xzvf BinDash_Linux_x86-64_v2.0.tar.gz
+./bindash --help
+```
+
+## If you have conda installed on linux
+
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/gsearch/README.html)
+
+```bash
+conda install bindash -c bioconda
+
+```
+## if you have homebrew insalled on MacOS
+```bash
+brew tap jianshu93/bindash
+brew update
+brew install --cc=gcc-13 bindash
+```
+
+# How to install from source:
 ```sh
 cd ${PROJECT_ROOT_DIRECTORY}  
 mkdir release && cd release
@@ -41,16 +60,11 @@ mkdir release && cd release
 CC="$(brew --prefix)/bin/gcc-13" CXX="$(brew --prefix)/bin/g++-13" cmake -DCMAKE_INSTALL_PREFIX=. ..
 make
 ```
+# Dependencies:
 
-## Or if you have conda installed on linux
-
-[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/gsearch/README.html)
-
-```bash
-conda install bindash -c bioconda
-
-```
-
+ - any C++ compiler supporting the C++11 standard
+ - CMake version 2.6 or plus
+ - zlib 
 
 # How to run:
 
