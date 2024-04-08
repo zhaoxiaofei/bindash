@@ -48,7 +48,7 @@
 #include <string.h>
 #include <time.h>
 
-#define VERSION "0.3.0"
+#define VERSION "2.2.0"
 
 /* TODO:
  * Potential improvement to be made: CACHE_AWARE nearest neighbor search (may involve substantial additional coding).
@@ -161,13 +161,23 @@ void entity_init(Entity &entity, CBuf &cbuf, const std::string &entityname, cons
 		if (1 == args.dens){
 			// use optimal densification
 			res = opt_densify(signs);
+			if (res != 0) {
+				std::cerr << "Warning: the genome " << entityname << " is densified with flag " << args.dens <<  std::endl;
+			}
 		} else if (2 == args.dens){
 			// use reverse optimal densification, or faster densification
 			res = revopt_densify(signs);
+			if (res != 0) {
+				std::cerr << "Warning: the genome " << entityname << " is densified with flag " << args.dens <<  std::endl;
+			}
+		} else if (3 == args.dens){
+			// use optimal densification with re-randomization
+			res = rerand_densify(signs);
+			if (res != 0) {
+				std::cerr << "Warning: the genome " << entityname << " is densified with flag " << args.dens <<  std::endl;
+			}
 		}
-		if (res != 0) {
-			std::cerr << "Warning: the genome " << entityname << " is densified with flag " << res <<  std::endl;
-		}
+
 		genome_size = estimate_genome_size2(signs, args.sketchsize64);
 		fillusigs(entity, signs, args.bbits);
 	}
