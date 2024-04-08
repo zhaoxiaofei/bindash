@@ -129,7 +129,8 @@ int Sketchargs::usage(const int argc, const char *const *argv) {
 	std::cerr << "  --nthreads : This many threads will be spawned for processing. [" << nthreads << "]\n\n";
 	std::cerr << "  --dens : This will use a specific densification strategy for minhashtype 2.\n" 
 				 "		1 means optimal densification, default. \n"
-				 "		2 means reverse optimal densification. [" << dens << "]\n\n";
+				 "		2 means reverse optimal (or faster) densification. \n"
+				 "		3 means re-randomized densification. [" << dens << "]\n\n";
 	std::cerr << "  --minhashtype : Type of minhash.\n" 
 	          << "    -1 means perfect hash function for nucleotides where 5^(kmerlen) < 2^63.\n" 
 	          << "    0 means one hash-function with multiple min-values.\n"

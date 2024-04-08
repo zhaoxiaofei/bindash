@@ -27,7 +27,7 @@
 #include <vector>
 #include <unordered_set>
 #include "murmur3.h"
-
+#include "xxhash_header_only.h"
 
 #define MEDIAN2X(data, n) ((data[(n-1)/2] + data[n/2]))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -44,7 +44,7 @@ void binsign(std::vector<uint64_t> &signs, const uint64_t sign, const uint64_t b
 	// std::cerr << "binning " << sign << std::endl;
 	uint64_t binidx = sign / binsize;
 	// assert(binidx < signs.size());
-//See Shrivastava and Li 2014, Densifying one permutation hashing via rota- tion for fast near neighbor search, 2014, ICML
+//See Shrivastava and Li 2014, Densifying one permutation hashing via rotation for fast near neighbor search, 2014, ICML
 #ifdef CANONICAL_DENSIFICATION
 	while (sign < signs[binidx]) {
 		signs[binidx] = sign;
@@ -144,6 +144,38 @@ int revopt_densify(std::vector<uint64_t>& signs) {
     return 1; // Return a status code indicating success
 }
 
+/* This densitfication strategy is found at
+@article{Li2019re-randomized,
+  title={Re-randomized Densification for One Permutation Hashing and Bin-wise Consistent Weighted Sampling},
+  author={Li, Ping},
+  journal={Neural Information Processing Systems, 2019},
+  year={2019}
+}
+*/
+int rerand_densify(std::vector<uint64_t>& signs) {
+	uint64_t minval = UINT64_MAX;
+    uint64_t maxval = 0;
+    for (auto sign : signs) {
+        minval = MIN(minval, sign);
+        maxval = MAX(maxval, sign);
+    }
+    if (UINT64_MAX != maxval) { return 0; }
+    if (UINT64_MAX == minval) { return -1; }
+
+    for (uint64_t i = 0; i < signs.size(); i++) {
+        if (signs[i] == UINT64_MAX) {
+            uint64_t j = i;
+            uint64_t nattempts = 0;
+            while (UINT64_MAX == signs[j]) {
+                j = univhash2(i, nattempts) % signs.size();
+                nattempts++;
+            }
+            // Using xxHash for the MinHash step before filling the empty bin. One hash function to approximate the permutation
+            signs[i] = XXH64(&signs[j], sizeof(signs[j]), i);
+        }
+    }
+    return 1;
+}
 void ppush(std::priority_queue<uint64_t> &signqueue, std::set<uint64_t> &signset, uint64_t sign, const size_t sketchsize64) {
 	if (signqueue.size() < sketchsize64 * NBITS(uint64_t) && signset.find(sign) == signset.end()) {
 		signset.insert(sign);
