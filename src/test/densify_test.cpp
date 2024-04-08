@@ -125,7 +125,7 @@ int rerand_densify(std::vector<uint64_t>& signs) {
                 nattempts++;
             }
             // Using xxHash for the MinHash step before filling the empty bin. One hash function to approximate the permutation
-            uint64_t seed = j;  // Using j as the seed for variability
+            uint64_t seed = i;  // Using j as the seed for variability
             signs[i] = XXH64(&signs[j], sizeof(signs[j]), seed);
         }
     }
