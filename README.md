@@ -1,7 +1,7 @@
 ![Alt!](https://github.com/jianshu93/bindash/blob/master/BinDash_logo.jpg?raw=true)
 
 
-BinDash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. BinDash is based on **Bin**wise **D**ensified minh**ash** for estimation of mutation rate between genomes. We implemented ***b-bit one-permutation rolling MinHash with optimal/faster densification***.  It is extremely fast and memory efficient. It can handle sequences consisting of terabytes of input data (gzipped or not, in fasta or fastq format). 
+BinDash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. BinDash is based on **Bin**wise **D**ensified minh**ash** for estimation of mutation rate between genomes. We implemented ***b-bit one-permutation rolling MinHash with optimal/faster/re-randomized densification***.  It is extremely fast and memory efficient. It can handle sequences consisting of terabytes of input data (gzipped or not, in fasta or fastq format). 
 
 The basic idea is: the Jaccard index as an accurate proxy of Average Nucleotide Identity(ANI) or mutation rate (1-ANI) according to equation:
 
@@ -107,7 +107,7 @@ Basically, compression of a genome is done as follows.
 # Limitations:
 
 - The k-mer size has to increase as the corresponding genome size increases. A natural solution is to use k-mer frequency instead of k-mer presence/abasence. However, this natural solution relies on a probabilistic model for k-mer frequency. Such model may be heavily genome-dependent.
-- Some large-scale genome rearrangement (e.g., chromosome duplication) brings very little change to Jaccard Index and mutation distance. Weighted Jaccard index estimation via BagMinHash or DartMinHash can be very useful. 
+- Some large-scale genome rearrangement (e.g., chromosome duplication) brings very little change to Jaccard Index and mutation distance. Weighted Jaccard index estimation via BagMinHash or DartMinHash can be very useful chromosome duplication (no positional information) while Order MinHash (assume linear, non-fragmented genomes) can be used for kmer positional information.
 
 # Additional Information:
 
