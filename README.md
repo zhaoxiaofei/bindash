@@ -74,10 +74,17 @@ bindash sketch --outfname=genomeA.sketch genomeA.fasta
 bindash sketch --outfname=genomeB.sketch genomeB.fasta
 bindash dist genomeA.sketch genomeB.sketch # print to stdout
 
-### or if you have a list of genomes, one genome per line in a list file.
+### or if you have a list of genomes, one genome per line in a list file. All versus all
 ls *.fasta > name.txt
 bindash sketch --listfname=name.txt --outfname=genome_sketch
 bindash dist --outfname=dist.txt genome_sketch
+
+### query against database genomes
+ls *_query.fasta > query.txt
+ls *_db.fasta > db.txt
+bindash sketch --listfname=query.txt --outfname=genome_query_sketch
+bindash sketch --listfname=db.txt --outfname=genome_db_sketch
+bindash dist --outfname=dist.txt genome_query_sketch genome_db_sketch
 ```
 
 The output of "bindash dist" consists of several lines. 

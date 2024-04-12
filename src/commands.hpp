@@ -76,7 +76,7 @@ public:
 	std::string listfname = "-";
 	size_t kmerlen = 16;
 	int minhashtype = 2;
-	int dens = 1;
+	int dens = 2;
 	size_t nthreads = std::thread::hardware_concurrency();
 	std::string outfname = "";
 	uint64_t randseed = 41; //0x3355557799AACCULL;
