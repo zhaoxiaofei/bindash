@@ -45,7 +45,7 @@ void allusage(const int argc, const char *const *argv) {
 	          << R"=(  |______/  |__| |__| \__| |_______/ /__/     \__\ |____/   |__|  |__|)=" << "\n"
 	          << " \n\n";
 	std::cerr << emojicpp::emojize(":alien::alien::alien:\n\n");
-	std::cerr << "B-bit One-Permutation Rolling MinHash with Optimal/Faster\n"
+	std::cerr << "B-bit One-Permutation Rolling MinHash with Optimal/Faster/re-randomized\n"
 			  << "Densification for Genome Search and Comparisons.\n" 
 			  << "Or Binwise Densified MinHash.\n\n"; 
 	std::cerr << "Usage:\n  " << argv[0] << " <commmand> [options] [arguments ...]\n\n";
@@ -76,7 +76,7 @@ public:
 	std::string listfname = "-";
 	size_t kmerlen = 16;
 	int minhashtype = 2;
-	int dens = 1;
+	int dens = 2;
 	size_t nthreads = std::thread::hardware_concurrency();
 	std::string outfname = "";
 	uint64_t randseed = 41; //0x3355557799AACCULL;
