@@ -1,3 +1,10 @@
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/bindash/README.html)
+![](https://anaconda.org/bioconda/bindash/badges/license.svg)
+![](https://anaconda.org/bioconda/bindash/badges/version.svg)
+![](https://anaconda.org/bioconda/bindash/badges/latest_release_relative_date.svg)
+![](https://anaconda.org/bioconda/bindash/badges/platforms.svg)
+
+
 ![Alt!](https://github.com/jianshu93/bindash/blob/master/BinDash_logo.jpg?raw=true)
 
 
@@ -120,10 +127,15 @@ Basically, compression of a genome is done as follows.
 
 All suggestions, comments, and feature requests are welcome.
 
-Author: XiaoFei Zhao (cndfeifei AT hotmail DOT com)  
+Author: XiaoFei Zhao (cndfeifei AT hotmail DOT com)  & Jianshu Zhao (jianshu.zhao@yahoo.com)
 License: Apache 2.0
 
-# Reference
+# Papers
+XiaoFei Zhao; BinDash, software for fast genome distance estimation on a typical personal laptop. Bioinformatics, 2018. bty651, https://doi.org/10.1093/bioinformatics/bty651
+
+Zhao J, Zhao X, Pierre-Both J, Konstantinidis KT. BinDash 2.0: new MinHash scheme allows ultra-fast and accurate genome search and comparisons. bioRxiv. 2024:2024-03. https://www.biorxiv.org/content/10.1101/2024.03.13.584875v1.abstract
+
+# Other related Reference
 
 Owen Kaser and Daniel Lemire, Strongly universal string hashing is fast, Computer Journal (2014) 57 (11): 1624-1638. http://arxiv.org/abs/1202.4961
 
@@ -139,4 +151,4 @@ Tung Mai et.al., On Densification for Minwise Hashing, Uncertainty in Artificial
 
 Ping Li et.al., Re-randomized Densification for One Permutation Hashing and Bin-wise Consistent Weighted Sampling, 33rd Conference on Neural Information Processing Systems (NIPS), 2019. https://proceedings.neurips.cc/paper/2019/hash/9f067d8d6df2d4b8c64fb4c084d6c208-Abstract.html
 
-XiaoFei Zhao; BinDash, software for fast genome distance estimation on a typical personal laptop. Bioinformatics, 2018. bty651, https://doi.org/10.1093/bioinformatics/bty651
+
