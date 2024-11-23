@@ -167,9 +167,11 @@ void entity_init(Entity &entity, CBuf &cbuf, const std::string &entityname, cons
 		} else if (2 == args.dens){
 			// use reverse optimal densification, or faster densification
 			res = revopt_densify(signs);
+			entity.usigs = std::vector<uint64_t>((args.sketchsize64 / 2) * args.bbits, 0);
 			if (res != 0) {
 				std::cerr << "Warning: the genome " << entityname << " is densified with flag " << args.dens <<  std::endl;
 			}
+			
 		} else if (3 == args.dens){
 			// use optimal densification with re-randomization
 			res = rerand_densify(signs);

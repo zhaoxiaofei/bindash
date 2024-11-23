@@ -25,10 +25,10 @@ tar -xzvf BinDash_Linux_x86-64_v2.0.tar.gz
 
 ## If you have conda installed on linux
 
-[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/gsearch/README.html)
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/bindash/README.html)
 
 ```bash
-conda install bindash -c bioconda
+conda install bindash -c bioconda -c conda-forge
 
 ```
 ## if you have homebrew insalled on MacOS
