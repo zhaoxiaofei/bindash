@@ -81,7 +81,7 @@ void kmerset_dist(const Kmerset &ks1, const Kmerset &ks2, size_t kmerlen) {
 	//double pvalue = bhmath_pbinom(sketchsize64 * NBITS(uint64_t), p, intersize);
 	size_t n = MIN(ks1.kmers.size(), ks2.kmers.size());
 	double sd = sqrt(n * p * (1-p));
-	printf("%s\t%s\t%.5e\terf(%.5e)\t%lu\t%lu\n",
+	printf("%s\t%s\t%.4f\terf(%.4f)\t%lu\t%lu\n",
 		   ks1.name.c_str(), ks2.name.c_str(),
 		   mutdist, (jaccard_idx - p) * (double)n / sd, intersize, unionsize);
 }

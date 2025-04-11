@@ -51,8 +51,6 @@ bindash dist ${PREFIX}bindash_nthreads8 --nthreads=8 --mthres=1e9 > ${PREFIX}bin
 mash sketch -l "${FILE_CONTAINING_ONE_GENOME_FILENAME_PER_LINE}" -o ${PREFIX}mash_nthreads8 -p 8 # use default -s
 mash dist ${PREFIX}mash_nthreads8.msh ${PREFIX}mash_nthreads8.msh -p 8 > ${PREFIX}mash_nthreads8_result.tsv
 
-kssd dist -l query.txt -r reference.txt -p 8 -o try -O dist.txt
-
 bindashRMSE=$(python evaluate-output.py ${PREFIX}groundtruth_nthreads8_result.tsv ${PREFIX}bindash_nthreads8_result.tsv | awk 'BEGIN {sumSqrErr = 0; countErr = 0; } { sumSqrErr += $2 * $2; countErr += 1 } END {print sqrt(sumSqrErr / countErr); }') # this is the RMSE (root-mean-square error) produced by bindash
 
 mashRMSE=$(python evaluate-output.py ${PREFIX}groundtruth_nthreads8_result.tsv ${PREFIX}mash_nthreads8_result.tsv | awk 'BEGIN {sumSqrErr = 0; countErr = 0; } { sumSqrErr += $2 * $2; countErr += 1 } END {print sqrt(sumSqrErr / countErr); }') # this is the RMSE (root-mean-square error) produced by mash
