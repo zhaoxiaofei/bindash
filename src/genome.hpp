@@ -19,6 +19,7 @@
 
 // #include "libpopcnt-2.2/libpopcnt.h" // the libpopcnt code that is used in this file is copied into this file
 
+#include <cstdint>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -151,32 +152,38 @@ void fillusigs(Entity &entity, const std::vector<uint64_t> &signs, size_t bbits)
 
 size_t calc_intersize0(size_t &intersize, size_t &unionsize, 
 		const Entity &e1, const Entity &e2, size_t sketchsize64) {
-	unsigned int i = 0;
-	unsigned int j = 0;
+
+	unsigned int i = e1.usigs.size();
+	unsigned int j = e2.usigs.size();
 	unsigned int samebits = 0;
 	unsigned int diffbits = 0;
-	while (i < e1.usigs.size() && j < e2.usigs.size()) {
-		if (e1.usigs[i] == e2.usigs[j]) {
+	unsigned int remaining = sketchsize64 * NBITS(uint64_t);
+	while (remaining > 0 && i > 0 && j > 0) {
+		remaining--;
+		if (e1.usigs[i-1] == e2.usigs[j-1]) {
 			samebits++;
-			i++;j++;
+			i--;
+			j--;
 		} else {
 			diffbits++;
-			if (e1.usigs[i] < e2.usigs[j]) {
-				j++;
+			if (e1.usigs[i-1] < e2.usigs[j-1]) {
+				i--;
 			} else {
-				i++;
+				j--;
 			}
 		}
 	}
-	if (i < e1.usigs.size()) {
-		diffbits += e1.usigs.size() - i;
-	} else if (j < e2.usigs.size()) {
-		diffbits += e2.usigs.size() - j;
+	if(remaining > 0) {
+		if(i > 0) {
+			diffbits += std::min(remaining, i);
+		} else if(j > 0) {
+			diffbits += std::min(remaining, j);
+		}
 	}
 	intersize = samebits;
 	unionsize = samebits + diffbits;
-	assert(intersize + unionsize == e1.usigs.size() + e2.usigs.size());
-	return ROUNDDIV((sketchsize64 * NBITS(uint64_t)) * samebits, samebits + diffbits);
+	// This is usually just intersize, unless the union is smaller than the target sketch size.
+	return ROUNDDIV((sketchsize64 * NBITS(uint64_t)) * intersize, unionsize);
 }
 
 template <class T>
