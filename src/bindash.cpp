@@ -48,7 +48,7 @@
 #include <string.h>
 #include <time.h>
 
-#define VERSION "2.4.0"
+#define VERSION "2.4.1"
 
 /* TODO:
  * Potential improvement to be made: CACHE_AWARE nearest neighbor search (may involve substantial additional coding).
