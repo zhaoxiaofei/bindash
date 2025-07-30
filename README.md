@@ -1,5 +1,13 @@
-![Alt!](https://github.com/jianshu93/bindash/blob/master/BinDash_logo.jpg?raw=true)
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/bindash/README.html)
+![](https://anaconda.org/bioconda/bindash/badges/license.svg)
+![](https://anaconda.org/bioconda/bindash/badges/version.svg)
+![](https://anaconda.org/bioconda/bindash/badges/latest_release_relative_date.svg)
+![](https://anaconda.org/bioconda/bindash/badges/platforms.svg)
+[![install with conda](https://anaconda.org/bioconda/bindash/badges/downloads.svg)](https://anaconda.org/bioconda/gsearch)
 
+<div align="center">
+  <img width="65%" src ="BinDash_logo.svg">
+</div>
 
 BinDash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. BinDash is based on **Bin**wise **D**ensified minh**ash** for estimation of mutation rate between genomes. We implemented ***b-bit one-permutation rolling MinHash with optimal/faster/re-randomized densification***.  It is extremely fast and memory efficient. It can handle sequences consisting of terabytes of input data (gzipped or not, in fasta or fastq format). 
 
@@ -12,6 +20,32 @@ if assuming a Poisson model, and
 $$ANI=(\frac{2*J}{1+J})^{\frac{1}{k}}$$
 
 if assuming a Binomial model. You can specify which model to use via --model option, see below.
+
+
+If you find BinDash useful, please cite the following papers:
+
+```bash
+@article{zhao2019bindash,
+  title={BinDash, software for fast genome distance estimation on a typical personal laptop},
+  author={Zhao, XiaoFei},
+  journal={Bioinformatics},
+  volume={35},
+  number={4},
+  pages={671--673},
+  year={2019},
+  publisher={Oxford University Press}
+}
+
+@article{zhao2024bindash,
+  title={Bindash 2.0: new MinHash scheme allows ultra-fast and accurate genome search and comparisons},
+  author={Zhao, Jianshu and Zhao, Xiaofei and Pierre-Both, Jean and Konstantinidis, Konstantinos T},
+  journal={bioRxiv},
+  pages={2024--03},
+  year={2024},
+  publisher={Cold Spring Harbor Laboratory}
+}
+
+```
 
 
 # How to install (simple):
@@ -140,3 +174,5 @@ Tung Mai et.al., On Densification for Minwise Hashing, Uncertainty in Artificial
 Ping Li et.al., Re-randomized Densification for One Permutation Hashing and Bin-wise Consistent Weighted Sampling, 33rd Conference on Neural Information Processing Systems (NIPS), 2019. https://proceedings.neurips.cc/paper/2019/hash/9f067d8d6df2d4b8c64fb4c084d6c208-Abstract.html
 
 XiaoFei Zhao; BinDash, software for fast genome distance estimation on a typical personal laptop. Bioinformatics, 2018. bty651, https://doi.org/10.1093/bioinformatics/bty651
+
+Zhao, J., Zhao, X., Pierre-Both, J. and Konstantinidis, K.T., 2024. Bindash 2.0: new MinHash scheme allows ultra-fast and accurate genome search and comparisons. bioRxiv, pp.2024-03. https://www.biorxiv.org/content/10.1101/2024.03.13.584875v1.abstract
