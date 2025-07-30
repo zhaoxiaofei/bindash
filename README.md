@@ -6,7 +6,7 @@
 [![install with conda](https://anaconda.org/bioconda/bindash/badges/downloads.svg)](https://anaconda.org/bioconda/gsearch)
 
 <div align="center">
-  <img width="30%" src ="BinDash_logo.svg">
+  <img width="40%" src ="BinDash_logo.svg">
 </div>
 
 BinDash is a command-line software for comparing genomes (including metagenomes and pangenomes) on a typical personal laptop. BinDash is based on **Bin**wise **D**ensified minh**ash** for estimation of mutation rate between genomes. We implemented ***b-bit one-permutation rolling MinHash with optimal/faster/re-randomized densification***.  It is extremely fast and memory efficient. It can handle sequences consisting of terabytes of input data (gzipped or not, in fasta or fastq format). 
