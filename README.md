@@ -3,7 +3,7 @@
 ![](https://anaconda.org/bioconda/bindash/badges/version.svg)
 ![](https://anaconda.org/bioconda/bindash/badges/latest_release_relative_date.svg)
 ![](https://anaconda.org/bioconda/bindash/badges/platforms.svg)
-[![install with conda](https://anaconda.org/bioconda/bindash/badges/downloads.svg)](https://anaconda.org/bioconda/gsearch)
+[![install with conda](https://anaconda.org/bioconda/bindash/badges/downloads.svg)](https://anaconda.org/bioconda/bindash)
 
 <div align="center">
   <img width="40%" src ="BinDash_logo.svg">
