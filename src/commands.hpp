@@ -45,7 +45,7 @@ void allusage(const int argc, const char *const *argv) {
 	          << R"=(  |______/  |__| |__| \__| |_______/ /__/     \__\ |____/   |__|  |__|)=" << "\n"
 	          << " \n\n";
 	std::cerr << emojicpp::emojize(":alien::alien::alien:\n\n");
-	std::cerr << "B-bit One-Permutation Rolling MinHash with Optimal/Faster/re-randomized\n"
+	std::cerr << "B-bit One-Permutation Rolling MinHash with Optimal/Faster\n"
 			  << "Densification for Genome Search and Comparisons.\n" 
 			  << "Or Binwise Densified MinHash.\n\n"; 
 	std::cerr << "Usage:\n  " << argv[0] << " <commmand> [options] [arguments ...]\n\n";
@@ -76,7 +76,7 @@ public:
 	std::string listfname = "-";
 	size_t kmerlen = 16;
 	int minhashtype = 2;
-	int dens = 2;
+	int dens = 1;
 	size_t nthreads = std::thread::hardware_concurrency();
 	std::string outfname = "";
 	uint64_t randseed = 41; //0x3355557799AACCULL;
@@ -129,8 +129,7 @@ int Sketchargs::usage(const int argc, const char *const *argv) {
 	std::cerr << "  --nthreads : This many threads will be spawned for processing. [" << nthreads << "]\n\n";
 	std::cerr << "  --dens : This will use a specific densification strategy for minhashtype 2.\n" 
 				 "		1 means optimal densification, default. \n"
-				 "		2 means reverse optimal (or faster) densification. \n"
-				 "		3 means re-randomized densification. [" << dens << "]\n\n";
+				 "		2 means reverse optimal densification. [" << dens << "]\n\n";
 	std::cerr << "  --minhashtype : Type of minhash.\n" 
 	          << "    -1 means perfect hash function for nucleotides where 5^(kmerlen) < 2^63.\n" 
 	          << "    0 means one hash-function with multiple min-values.\n"
@@ -319,11 +318,11 @@ void parse_metaf(std::vector<std::vector<std::pair<size_t, size_t>>> &fid_to_ent
 class Distargs {
 public:
 	std::vector<std::string> infnames;
-	size_t ithres = 2;
+	size_t ithres = 0;
 	double mthres = 2.5;
 	size_t nneighbors = 0;
 	size_t nthreads = std::thread::hardware_concurrency();
-	int model = 1;
+	int model = 2;
 	std::string outfname = "-";
 	double pthres = 1 + 1e-4;
 	int usage(const int argc, const char *const *argv);
